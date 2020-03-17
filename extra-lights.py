@@ -30,17 +30,26 @@ nat_01 = Light("Candle", "POINT", 0.015, 1800, 12.57)
 nat_02 = Light("Fireplace", "POINT", 0.228, 2000, 500)
 
 inc_01 = Light("10w C7 Candelabra", "POINT", 0.015, 2700, 70)
-inc_02 = Light("25w A15", "POINT", 0.0216, 2700, 210)
+inc_02 = Light("Vintage Tungsten", "POINT", 0.025, 2700, 245)
+inc_03 = Light("25w A15", "POINT", 0.0216, 2700, 210)
+inc_04 = Light("40w A15", "POINT", 0.0216, 2700, 400)
+inc_05 = Light("75w A19", "POINT", 0.03, 2775, 1050)
+inc_06 = Light("150w A21", "POINT", 0.033, 2700, 1050)
+inc_07 = Light("200w A21", "POINT", 0.033, 2700, 3880)
+inc_08 = Light("Halogen Car Headlight", "SPOT", 0.02, 4100, 3000)
+inc_09 = Light("300w PS30", "POINT", 0.038, 2700, 5870)
 
 led_01 = Light("400 Lumen Flashlight", "SPOT", 0.0075, 2700, 400)
 led_02 = Light("1400 Lumen Flashlight", "SPOT", 0.0075, 4000, 1400)
-led_03 = Light("60w A19 White", "POINT", 0.034, 3000, 800)
-led_04 = Light("100w A21 Daylight", "POINT", 0.034, 5000, 1600)
-led_05 = Light("150w PAR38 White", "POINT", 0.06, 3000, 1400)
-led_06 = Light("250w PAR38 White", "POINT", 0.06, 3000, 2600)
+led_03 = Light("60w A19 White LED", "POINT", 0.034, 3000, 800)
+led_04 = Light("100w A21 Daylight LED", "POINT", 0.034, 5000, 1600)
+led_05 = Light("150w PAR38 White LED", "POINT", 0.06, 3000, 1400)
+led_06 = Light("250w PAR38 White LED", "POINT", 0.06, 3000, 2600)
+led_07 = Light("LED Car Headlight", "SPOT", 0.02, 6500, 5000)
+led_08 = Light("350w Outdoor Flood", "AREA", 0.178, 5000, 9100)
 
 fl_01 = Light("45w Daylight CFL", "POINT", 0.03, 5500, 2250)
-fl_02 = Light("60w Halogen Headlight", "SPOT", 0.02, 4100, 3000)
+fl_02 = Light("85w Daylight CFL", "POINT", 0.03, 6500, 4500)
 
 # Append Lumens Converter if it's not already in the file
 
@@ -68,22 +77,41 @@ def create_light(self, context, light):
     
     # Create nodes
     
-    light_data.use_nodes = True
-    
-    nodes = light_data.node_tree.nodes
-    links = light_data.node_tree.links
-    
-    lumens_node = nodes.new("ShaderNodeGroup")
-    lumens_node.node_tree = bpy.data.node_groups["Lumens Converter"]
-    links.new(lumens_node.outputs[0], nodes["Light Output"].inputs[0])
+    def setup_lumens(): 
+        light_data.energy = 1
+        light_data.use_nodes = True
+        
+        nodes = light_data.node_tree.nodes
+        links = light_data.node_tree.links
+        
+        lumens_node = nodes.new("ShaderNodeGroup")
+        lumens_node.node_tree = bpy.data.node_groups["Lumens Converter"]
+        links.new(lumens_node.outputs[0], nodes["Light Output"].inputs[0])
+
+        lumens_node.inputs[0].default_value = light.lumens
+        lumens_node.inputs[1].default_value = light.temp
     
     # Set properties 
+
+    if light.lightType == "SPOT" or "POINT":
+        setup_lumens()
+        light_data.shadow_soft_size = light.radius
+    elif light.lightType == "AREA":
+        setup_lumens()
+        light_data.size = light.radius
+    elif light.lightType == "SUN":
+        light_data.energy = light.lumens
+        light_data.angle = light.radius
     
-    light_data.shadow_soft_size = light.radius
-    light_data.energy = 1
+    # Set location and rotation
     
-    lumens_node.inputs[0].default_value = light.lumens
-    lumens_node.inputs[1].default_value = light.temp
+    light_object.location = bpy.context.scene.cursor.location
+    
+    if light.lightType == "SPOT":
+        light_object.rotation_euler[0] = 1.5708
+    elif light.lightType == "SUN":
+        light_object.rotation_euler[0] = 0.785398
+        light_object.rotation_euler[1] = 0.785398
     
 # Create operators
 
@@ -92,6 +120,14 @@ class OBJECT_OT_add_nat01(Operator, AddObjectHelper):
     bl_idname = "light.add_nat01"
     bl_label = "Add Natural Light"
     bl_options = {'REGISTER', 'UNDO'}
+
+    lightLumens: bpy.props.IntProperty(
+        name = "Lumens",
+        default = nat_01.lumens,
+        min = 50,
+        max = 20000,
+        description = "Perceptual strength of the light as measured in lumens",
+    )
 
     def execute(self, context):
             create_light(self, context, nat_01)
@@ -123,6 +159,69 @@ class OBJECT_OT_add_inc02(Operator, AddObjectHelper):
 
     def execute(self, context):
             create_light(self, context, inc_02)
+            return {'FINISHED'}
+
+class OBJECT_OT_add_inc03(Operator, AddObjectHelper):
+    bl_idname = "light.add_inc_03"
+    bl_label = "Add Incandescent Light"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+            create_light(self, context, inc_03)
+            return {'FINISHED'}
+
+class OBJECT_OT_add_inc04(Operator, AddObjectHelper):
+    bl_idname = "light.add_inc_04"
+    bl_label = "Add Incandescent Light"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+            create_light(self, context, inc_04)
+            return {'FINISHED'}
+
+class OBJECT_OT_add_inc05(Operator, AddObjectHelper):
+    bl_idname = "light.add_inc_05"
+    bl_label = "Add Incandescent Light"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+            create_light(self, context, inc_05)
+            return {'FINISHED'}
+
+class OBJECT_OT_add_inc06(Operator, AddObjectHelper):
+    bl_idname = "light.add_inc_06"
+    bl_label = "Add Incandescent Light"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+            create_light(self, context, inc_06)
+            return {'FINISHED'}
+
+class OBJECT_OT_add_inc07(Operator, AddObjectHelper):
+    bl_idname = "light.add_inc_07"
+    bl_label = "Add Incandescent Light"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+            create_light(self, context, inc_07)
+            return {'FINISHED'}
+
+class OBJECT_OT_add_inc08(Operator, AddObjectHelper):
+    bl_idname = "light.add_inc_08"
+    bl_label = "Add Incandescent Light"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+            create_light(self, context, inc_08)
+            return {'FINISHED'}
+
+class OBJECT_OT_add_inc09(Operator, AddObjectHelper):
+    bl_idname = "light.add_inc_09"
+    bl_label = "Add Incandescent Light"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+            create_light(self, context, inc_09)
             return {'FINISHED'}
 
 # LED lights
@@ -180,6 +279,24 @@ class OBJECT_OT_add_led06(Operator, AddObjectHelper):
             create_light(self, context, led_06)
             return {'FINISHED'}
 
+class OBJECT_OT_add_led07(Operator, AddObjectHelper):
+    bl_idname = "light.add_led_07"
+    bl_label = "Add LED Light"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+            create_light(self, context, led_07)
+            return {'FINISHED'}
+
+class OBJECT_OT_add_led08(Operator, AddObjectHelper):
+    bl_idname = "light.add_led_08"
+    bl_label = "Add LED Light"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+            create_light(self, context, led_08)
+            return {'FINISHED'}
+
 # Flourescent lights
 class OBJECT_OT_add_fl01(Operator, AddObjectHelper):
     bl_idname = "light.add_fl_01"
@@ -230,6 +347,34 @@ class IncandescentsMenu(bpy.types.Menu):
             OBJECT_OT_add_inc02.bl_idname,
             text=inc_02.name,
             icon='LIGHT_'+inc_02.lightType)
+        self.layout.operator(
+            OBJECT_OT_add_inc03.bl_idname,
+            text=inc_03.name,
+            icon='LIGHT_'+inc_03.lightType)
+        self.layout.operator(
+            OBJECT_OT_add_inc04.bl_idname,
+            text=inc_04.name,
+            icon='LIGHT_'+inc_04.lightType)
+        self.layout.operator(
+            OBJECT_OT_add_inc05.bl_idname,
+            text=inc_05.name,
+            icon='LIGHT_'+inc_05.lightType)
+        self.layout.operator(
+            OBJECT_OT_add_inc06.bl_idname,
+            text=inc_06.name,
+            icon='LIGHT_'+inc_06.lightType)
+        self.layout.operator(
+            OBJECT_OT_add_inc07.bl_idname,
+            text=inc_07.name,
+            icon='LIGHT_'+inc_07.lightType)
+        self.layout.operator(
+            OBJECT_OT_add_inc08.bl_idname,
+            text=inc_08.name,
+            icon='LIGHT_'+inc_08.lightType)
+        self.layout.operator(
+            OBJECT_OT_add_inc09.bl_idname,
+            text=inc_09.name,
+            icon='LIGHT_'+inc_09.lightType)
 
 class LEDsMenu(bpy.types.Menu):
     bl_idname = "OBJECT_MT_leds_menu"
@@ -261,6 +406,14 @@ class LEDsMenu(bpy.types.Menu):
             OBJECT_OT_add_led06.bl_idname,
             text=led_06.name,
             icon='LIGHT_'+led_06.lightType)
+        self.layout.operator(
+            OBJECT_OT_add_led07.bl_idname,
+            text=led_07.name,
+            icon='LIGHT_'+led_07.lightType)
+        self.layout.operator(
+            OBJECT_OT_add_led08.bl_idname,
+            text=led_08.name,
+            icon='LIGHT_'+led_08.lightType)
 
 class FlourescentsMenu(bpy.types.Menu):
     bl_idname = "OBJECT_MT_flourescents_menu"
@@ -302,6 +455,13 @@ classes = (
 
     OBJECT_OT_add_inc01,
     OBJECT_OT_add_inc02,
+    OBJECT_OT_add_inc03,
+    OBJECT_OT_add_inc04,
+    OBJECT_OT_add_inc05,
+    OBJECT_OT_add_inc06,
+    OBJECT_OT_add_inc07,
+    OBJECT_OT_add_inc08,
+    OBJECT_OT_add_inc09,
 
     OBJECT_OT_add_led01,
     OBJECT_OT_add_led02,
@@ -309,6 +469,8 @@ classes = (
     OBJECT_OT_add_led04,
     OBJECT_OT_add_led05,
     OBJECT_OT_add_led06,
+    OBJECT_OT_add_led07,
+    OBJECT_OT_add_led08,
     
     OBJECT_OT_add_fl01,
     OBJECT_OT_add_fl02,
