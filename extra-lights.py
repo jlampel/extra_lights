@@ -59,15 +59,32 @@ if (bpy.data.node_groups.find("Lumens Converter") == -1):
 
 def create_light(self, context, light):
     light_data = bpy.data.lights.new(name=light.name+"Data", type=light.lightType)
-    light_data.shadow_soft_size = light.radius
-    
     light_object = bpy.data.objects.new(name=light.name, object_data=light_data)
     
     bpy.context.collection.objects.link(light_object)
     bpy.ops.object.select_all(action='DESELECT')
     light_object.select_set(state = True)
     context.view_layer.objects.active = light_object
-
+    
+    # Create nodes
+    
+    light_data.use_nodes = True
+    
+    nodes = light_data.node_tree.nodes
+    links = light_data.node_tree.links
+    
+    lumens_node = nodes.new("ShaderNodeGroup")
+    lumens_node.node_tree = bpy.data.node_groups["Lumens Converter"]
+    links.new(lumens_node.outputs[0], nodes["Light Output"].inputs[0])
+    
+    # Set properties 
+    
+    light_data.shadow_soft_size = light.radius
+    light_data.energy = 1
+    
+    lumens_node.inputs[0].default_value = light.lumens
+    lumens_node.inputs[1].default_value = light.temp
+    
 # Create operators
 
 # Natural lights
