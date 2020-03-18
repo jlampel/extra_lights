@@ -12,7 +12,8 @@ bl_info = {
 
 import bpy
 import os
-from bpy.types import Operator
+from bpy.props import IntProperty
+from bpy.types import Operator, PropertyGroup
 from bpy.utils import register_class, unregister_class
 from bpy_extras.object_utils import AddObjectHelper, object_data_add
 
@@ -27,8 +28,7 @@ class Light:
         self.temp = temp
         self.lumens = lumens
 
-
-nat_01 = Light("Candle", "candle", "POINT", 0.015, 1800, 12.57)
+nat_01 = Light("Candle", "candle", "POINT", 0.015, 1800, 12)
 nat_02 = Light("Fireplace", "fireplace", "POINT", 0.228, 2000, 500)
 natural_lights = [nat_01, nat_02]
 
@@ -59,48 +59,37 @@ flourescent_lights = [fl_01, fl_02]
 
 all_lights = natural_lights + incandescent_lights + led_lights + flourescent_lights
 
-# Append Lumens Converter if it's not already in the file
-
-if (bpy.data.node_groups.find("Lumens Converter") == -1):
-
-    blendfile = "C:/Users/jonat/Documents/GitHub/extra-lights/lights/real_lights.blend"
-    section = "\\NodeTree\\"
-    object = "Lumens Converter"
-
-    bpy.ops.wm.append(
-        filename = object,
-        directory = blendfile + section
-        )
-
 # Add new light
-
-def create_light(self, context, light):
-    light_data = bpy.data.lights.new(name=light.name+"Data", type=light.lightType)
+def create_light(self, context, light, strength, temp):
+    light_data = bpy.data.lights.new(name=light.name, type=light.lightType)
     light_object = bpy.data.objects.new(name=light.name, object_data=light_data)
-    
     bpy.context.collection.objects.link(light_object)
     bpy.ops.object.select_all(action='DESELECT')
     light_object.select_set(state = True)
     context.view_layer.objects.active = light_object
+
+    # Append Lumens Converter if it's not already in the file
+    if (bpy.data.node_groups.find("Lumens Converter") == -1):
+        bpy.ops.wm.append(
+            filename = "Lumens Converter", 
+            directory = "C:/Users/jonat/Documents/GitHub/extra-lights/lights/real_lights.blend\\NodeTree\\"
+        )
     
     # Create nodes
-    
     def setup_lumens(): 
         light_data.energy = 1
         light_data.use_nodes = True
-        
         nodes = light_data.node_tree.nodes
         links = light_data.node_tree.links
-        
+
         lumens_node = nodes.new("ShaderNodeGroup")
         lumens_node.node_tree = bpy.data.node_groups["Lumens Converter"]
         links.new(lumens_node.outputs[0], nodes["Light Output"].inputs[0])
 
-        lumens_node.inputs[0].default_value = light.lumens
-        lumens_node.inputs[1].default_value = light.temp
+        lumens_node.inputs[0].default_value = strength
+        lumens_node.inputs[1].default_value = temp
     
     # Set properties 
-
     if light.lightType == "SPOT" or "POINT":
         setup_lumens()
         light_data.shadow_soft_size = light.radius
@@ -108,13 +97,11 @@ def create_light(self, context, light):
         setup_lumens()
         light_data.size = light.radius
     elif light.lightType == "SUN":
-        light_data.energy = light.lumens
+        light_data.energy = strength
         light_data.angle = light.radius
     
     # Set location and rotation
-    
     light_object.location = bpy.context.scene.cursor.location
-    
     if light.lightType == "SPOT":
         light_object.rotation_euler[0] = 1.5708
     elif light.lightType == "SUN":
@@ -122,16 +109,33 @@ def create_light(self, context, light):
         light_object.rotation_euler[1] = 0.785398
     
 # Create operators
-
 def create_light_operator(light):
     class OBJECT_OT_add_light(Operator, AddObjectHelper):
         bl_idname = "light.add_" + light.id
         bl_label = "Add a " + light.name + " light"
+        bl_description = "Creates a physically based light"
         bl_options = {'REGISTER', 'UNDO'}
         name = light.name
         lightType = light.lightType
+
+        strength: bpy.props.IntProperty(
+            name = "Lumens",
+            default = light.lumens,
+            min = 5,
+            max = 20000,
+            description = "Amound of percieved light emitted as measured in lumens",
+        )
+        
+        temp: bpy.props.IntProperty(
+            name = "Color Temperature",
+            default = light.temp,
+            min = 1500,
+            max = 8000,
+            description = "Color of the light according to the Kelvin temperature scale",
+        )
+
         def execute(self, context):
-                create_light(self, context, light)
+                create_light(self, context, light, self.strength, self.temp)
                 return {'FINISHED'}
     return OBJECT_OT_add_light
 natural_operators = [create_light_operator(light) for light in natural_lights]
@@ -140,7 +144,6 @@ led_operators = [create_light_operator(light) for light in led_lights]
 flourescent_operators = [create_light_operator(light) for light in flourescent_lights]
 
 # Create menu items
-
 class NaturalsMenu(bpy.types.Menu):
     bl_idname = "OBJECT_MT_naturals_menu"
     bl_label = "Natural"
@@ -195,14 +198,7 @@ def draw_FlourescentsMenu(self, context):
     self.layout.menu(FlourescentsMenu.bl_idname, icon='LIGHT')
 
 # Registration 
-
-classes = [
-    NaturalsMenu,
-    IncandescentsMenu,
-    LEDsMenu,
-    FlourescentsMenu,
-]
-
+classes = [NaturalsMenu, IncandescentsMenu, LEDsMenu, FlourescentsMenu]
 for op in natural_operators:
     classes.append(op)
 for op in incandescent_operators:
@@ -211,7 +207,7 @@ for op in led_operators:
     classes.append(op)
 for op in flourescent_operators:
     classes.append(op)
-        
+
 def register():
     for cls in classes:
         register_class(cls)
@@ -219,7 +215,7 @@ def register():
     bpy.types.VIEW3D_MT_light_add.append(draw_IncandescentsMenu)
     bpy.types.VIEW3D_MT_light_add.append(draw_LEDsMenu)
     bpy.types.VIEW3D_MT_light_add.append(draw_FlourescentsMenu)
-    
+
 def unregister():
     for cls in reversed(classes):
         unregister_class(cls)
