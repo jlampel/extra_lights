@@ -72,10 +72,8 @@ def create_light(self, context, light, strength, temp):
     # Append Lumens Converter if it's not already in the file
     if (bpy.data.node_groups.find("Lumens Converter") == -1):
         nodes_directory = os.path.dirname(os.path.abspath(__file__)) + "/lights/real_lights.blend\\NodeTree\\"
-        print(nodes_directory)
         bpy.ops.wm.append(
             filename = "Lumens Converter", 
-            #directory = "C:/Users/jonat/Documents/GitHub/extra-lights/lights/real_lights.blend\\NodeTree\\"
             directory = nodes_directory
         )
     
