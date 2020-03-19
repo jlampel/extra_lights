@@ -162,13 +162,22 @@ def create_light_operator(light):
         name = light.name
         lightType = light.lightType
 
-        strength: bpy.props.IntProperty(
-            name = "Lumens",
-            default = light.strength,
-            min = 5,
-            max = 20000,
-            description = "Amound of percieved light emitted as measured in lumens",
-        )
+        if light.lightType == "SUN":
+            strength: bpy.props.IntProperty(
+                name = "Irradiance",
+                default = light.strength,
+                min = 50,
+                max = 2000,
+                description = "Amound of light that hits a direct surface as measured in watts per square meter",
+            )
+        else:
+            strength: bpy.props.IntProperty(
+                name = "Lumens",
+                default = light.strength,
+                min = 5,
+                max = 20000,
+                description = "Amound of percieved light emitted as measured in lumens",
+            )
         temp: bpy.props.IntProperty(
             name = "Color Temperature",
             default = light.temp,
