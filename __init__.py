@@ -14,7 +14,6 @@ import bpy
 from bpy.props import IntProperty, BoolProperty
 from bpy.types import Operator, PropertyGroup
 from bpy.utils import register_class, unregister_class
-from bpy_extras.object_utils import AddObjectHelper, object_data_add
 import os
 from pathlib import Path
 
@@ -65,17 +64,14 @@ all_lights = natural_lights + incandescent_lights + led_lights + flourescent_lig
 
 # Add new light
 def create_light(self, context, light, strength, temp, useNodes):
-    light_data = bpy.data.lights.new(name=light.name, type=light.lightType)
-    light_object = bpy.data.objects.new(name=light.name, object_data=light_data)
-    bpy.context.collection.objects.link(light_object)
-    bpy.ops.object.select_all(action='DESELECT')
-    light_object.select_set(state = True)
-    context.view_layer.objects.active = light_object
-    light_object.location = bpy.context.scene.cursor.location
+    bpy.ops.object.light_add(type=light.lightType)
+    bpy.context.active_object.name = light.name
+    light_object = bpy.data.objects[light.name]
+    light_data = light_object.data
 
     # Append Lumens Converter if it's not already in the file
     if (bpy.data.node_groups.find("Lumens Converter") == -1):
-        nodes_directory = os.path.dirname(os.path.abspath(__file__)) + "/lights/real_lights.blend\\NodeTree\\"
+        nodes_directory = os.path.dirname(os.path.abspath(__file__)) + "/real_lights.blend\\NodeTree\\"
         bpy.ops.wm.append(
             filename = "Lumens Converter", 
             directory = nodes_directory
@@ -154,7 +150,7 @@ def create_light(self, context, light, strength, temp, useNodes):
     
 # Create operators
 def create_light_operator(light):
-    class OBJECT_OT_add_light(Operator, AddObjectHelper):
+    class OBJECT_OT_add_light(Operator):
         bl_idname = "light.add_" + light.id
         bl_label = "Add a " + light.name + " light"
         bl_description = "Creates a physically based light"
@@ -190,6 +186,15 @@ def create_light_operator(light):
             default = False,
             description = "Create light with nodes so that lumens and color temperature can be changed at any time. Currently only works with Cycles."
         )
+
+        def draw(self, context):
+            layout = self.layout
+            layout.use_property_split = True
+            layout.use_property_decorate = False
+
+            layout.prop(self, "strength")
+            layout.prop(self, "temp")
+            layout.prop(self, "useNodes")
 
         def execute(self, context):
                 create_light(self, context, light, self.strength, self.temp, self.useNodes)
