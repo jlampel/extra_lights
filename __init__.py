@@ -66,7 +66,7 @@ all_lights = natural_lights + incandescent_lights + led_lights + flourescent_lig
 def create_light(self, context, light, strength, temp, useNodes, useSky):
     bpy.ops.object.light_add(type=light.lightType)
     bpy.context.active_object.name = light.name
-    light_object = bpy.data.objects[light.name]
+    light_object = bpy.context.active_object
     light_data = light_object.data
 
     # Append Lumens Converter if it's not already in the file
@@ -116,6 +116,13 @@ def create_light(self, context, light, strength, temp, useNodes, useSky):
         elif light.id == "overcast":
             sky_texture.turbidity = 8
         nodes["Background"].inputs[1].default_value = 20
+
+    def to_linear(i):
+        if i <= 0.04045 :
+            x = i * (1.0 / 12.92)
+        else:
+            x = pow( (i + 0.055) * (1.0 / (1 + 0.055)), 2.4)
+        return x
     
     def convert_kelvin(kelvin):
         kelvin_table = {
@@ -134,7 +141,8 @@ def create_light(self, context, light, strength, temp, useNodes, useSky):
             12000: [195, 209, 255]
         }
         rgb = kelvin_table[round(kelvin, -2)]
-        color = [rgb[0]/255, rgb[1]/255, rgb[2]/255]
+
+        color = [to_linear(rgb[0]/255), to_linear(rgb[1]/255), to_linear(rgb[2]/255)]
         return color
 
     def convert_lumens(lumens, rgb):
