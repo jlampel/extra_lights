@@ -30,7 +30,7 @@ class Light:
 
 nat_01 = Light("Candle", "candle", "POINT", 0.015, 1800, 12)
 nat_02 = Light("Fireplace", "fireplace", "POINT", 0.228, 2000, 500)
-nat_03 = Light("Sunset", "sunset", "SUN", 0.526, 3500, 75)
+nat_03 = Light("Sunset", "sunset", "SUN", 0.526, 3200, 50)
 nat_04 = Light("Overcast Sun", "overcast", "SUN", 50, 7000, 250)
 nat_05 = Light("Direct Sun", "directsun", "SUN", 0.526, 5250, 1000)
 natural_lights = [nat_01, nat_02, nat_03, nat_04, nat_05]
@@ -63,7 +63,7 @@ flourescent_lights = [fl_01, fl_02]
 all_lights = natural_lights + incandescent_lights + led_lights + flourescent_lights
 
 # Add new light
-def create_light(self, context, light, strength, temp, useNodes):
+def create_light(self, context, light, strength, temp, useNodes, useSky):
     bpy.ops.object.light_add(type=light.lightType)
     bpy.context.active_object.name = light.name
     light_object = bpy.data.objects[light.name]
@@ -81,14 +81,41 @@ def create_light(self, context, light, strength, temp, useNodes):
         light_data.energy = 1
         light_data.use_nodes = True
         nodes = light_data.node_tree.nodes
-        links = light_data.node_tree.links
 
-        lumens_node = nodes.new("ShaderNodeGroup")
-        lumens_node.node_tree = bpy.data.node_groups["Lumens Converter"]
-        links.new(lumens_node.outputs[0], nodes["Light Output"].inputs[0])
+        if light.lightType == "SUN":
+            nodes["Emission"].inputs[1].default_value = strength
+            k = nodes.new("ShaderNodeBlackbody")
+            k.inputs[0].default_value = temp
+            light_data.node_tree.links.new(k.outputs[0], nodes["Emission"].inputs[0])
+        else:
+            lumens_node = nodes.new("ShaderNodeGroup")
+            lumens_node.node_tree = bpy.data.node_groups["Lumens Converter"]
+            light_data.node_tree.links.new(lumens_node.outputs[0], nodes["Light Output"].inputs[0])
 
-        lumens_node.inputs[0].default_value = strength
-        lumens_node.inputs[1].default_value = temp
+            lumens_node.inputs[0].default_value = strength
+            lumens_node.inputs[1].default_value = temp
+    
+    def setup_sky():
+        bpy.ops.world.new()
+        world = bpy.data.worlds["World"]
+        world.name = light.name + " World"
+        bpy.context.scene.world = world
+        nodes = world.node_tree.nodes
+
+        sky_texture = nodes.new("ShaderNodeTexSky")
+        world.node_tree.links.new(sky_texture.outputs[0], nodes["Background"].inputs[0])
+        dr = sky_texture.driver_add("sun_direction")
+        for i in range(3):
+            dr[i].driver.expression = "var"
+            var = dr[i].driver.variables.new()
+            var.targets[0].id = light_object
+            var.targets[0].data_path = "matrix_world[2]["+str(i)+"]"
+
+        if light.id == "sunset":
+            sky_texture.turbidity = 3
+        elif light.id == "overcast":
+            sky_texture.turbidity = 8
+        nodes["Background"].inputs[1].default_value = 20
     
     def convert_kelvin(kelvin):
         kelvin_table = {
@@ -141,11 +168,20 @@ def create_light(self, context, light, strength, temp, useNodes):
             light_data.energy = convert_lumens(strength, light_data.color)
             
     elif light.lightType == "SUN":
-        light_object.rotation_euler[0] = 0.785398
-        light_object.rotation_euler[1] = 0.785398
-        light_data.energy = strength
         light_data.angle = light.radius
-        light_data.color = convert_kelvin(temp)
+        if light.id == "sunset":
+            light_object.rotation_euler[0] = 1.4835
+            light_object.rotation_euler[1] = 0.785398
+        else:
+            light_object.rotation_euler[0] = 0.785398
+            light_object.rotation_euler[1] = 0.785398
+        if useNodes == True:
+            setup_nodes()
+        else: 
+            light_data.energy = strength
+            light_data.color = convert_kelvin(temp)
+        if useSky:
+            setup_sky()
         
     
 # Create operators
@@ -174,6 +210,11 @@ def create_light_operator(light):
                 max = 20000,
                 description = "Amound of percieved light emitted as measured in lumens",
             )
+        useNodes: bpy.props.BoolProperty(
+            name = "Use Nodes (Cycles only)",
+            default = False,
+            description = "Create light with nodes so that lumens and color temperature can be changed at any time. Currently only works with Cycles."
+        )
         temp: bpy.props.IntProperty(
             name = "Color Temperature",
             default = light.temp,
@@ -181,12 +222,12 @@ def create_light_operator(light):
             max = 12000,
             description = "Color of the light according to the Kelvin temperature scale",
         )
-        useNodes: bpy.props.BoolProperty(
-            name = "Use Nodes (Cycles only)",
+        useSky: bpy.props.BoolProperty(
+            name = "Create Linked Sky (Cylces only)",
             default = False,
-            description = "Create light with nodes so that lumens and color temperature can be changed at any time. Currently only works with Cycles."
+            description = "Create a new World with a Sky texture linked to the rotation of the sun lamp. Currently the Sky texture only renderes correctly in Cycles."
         )
-
+        
         def draw(self, context):
             layout = self.layout
             layout.use_property_split = True
@@ -195,9 +236,12 @@ def create_light_operator(light):
             layout.prop(self, "strength")
             layout.prop(self, "temp")
             layout.prop(self, "useNodes")
+            if light.lightType == "SUN":
+                layout.prop(self, "useSky")
+
 
         def execute(self, context):
-                create_light(self, context, light, self.strength, self.temp, self.useNodes)
+                create_light(self, context, light, self.strength, self.temp, self.useNodes, self.useSky)
                 return {'FINISHED'}
     return OBJECT_OT_add_light
 
