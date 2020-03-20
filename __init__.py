@@ -30,7 +30,7 @@ class Light:
 
 nat_01 = Light("Candle", "candle", "POINT", 0.015, 1800, 12)
 nat_02 = Light("Fireplace", "fireplace", "POINT", 0.228, 2000, 500)
-nat_03 = Light("Sunset", "sunset", "SUN", 0.526, 3200, 50)
+nat_03 = Light("Sunset", "sunset", "SUN", 0.75, 3000, 500)
 nat_04 = Light("Overcast Sun", "overcast", "SUN", 50, 7000, 250)
 nat_05 = Light("Direct Sun", "directsun", "SUN", 0.526, 5250, 1000)
 natural_lights = [nat_01, nat_02, nat_03, nat_04, nat_05]
@@ -113,9 +113,13 @@ def create_light(self, context, light, strength, temp, useNodes, useSky):
 
         if light.id == "sunset":
             sky_texture.turbidity = 3
+            nodes["Background"].inputs[1].default_value = 250
         elif light.id == "overcast":
             sky_texture.turbidity = 8
-        nodes["Background"].inputs[1].default_value = 20
+            nodes["Background"].inputs[1].default_value = 100
+        else:
+            nodes["Background"].inputs[1].default_value = 750
+        
 
     def to_linear(i):
         if i <= 0.04045 :
@@ -157,6 +161,7 @@ def create_light(self, context, light, strength, temp, useNodes, useSky):
         else:
             light_data.color = convert_kelvin(temp)
             light_data.energy = convert_lumens(strength, light_data.color)
+            light_data.use_custom_distance = True
             
     elif light.lightType == "SPOT":
         light_object.rotation_euler[0] = 1.5708
@@ -166,6 +171,7 @@ def create_light(self, context, light, strength, temp, useNodes, useSky):
         else:
             light_data.color = convert_kelvin(temp)
             light_data.energy = convert_lumens(strength, light_data.color)
+            light_data.use_custom_distance = True
             
     elif light.lightType == "AREA":
         light_data.size = light.radius
@@ -174,6 +180,7 @@ def create_light(self, context, light, strength, temp, useNodes, useSky):
         else:
             light_data.color = convert_kelvin(temp)
             light_data.energy = convert_lumens(strength, light_data.color)
+            light_data.use_custom_distance = True
             
     elif light.lightType == "SUN":
         light_data.angle = light.radius
