@@ -63,17 +63,29 @@ flourescent_lights = [fl_01, fl_02]
 all_lights = natural_lights + incandescent_lights + led_lights + flourescent_lights
 
 # Add new light
-def create_light(self, context, light, strength, temp, useNodes, useSky):
+def create_light(self, context, light, strength, temp, useNodes, useSky, spotSize):
     bpy.ops.object.light_add(type=light.lightType)
     bpy.context.active_object.name = light.name
     light_object = bpy.context.active_object
     light_data = light_object.data
 
-    # Append Lumens Converter if it's not already in the file
+    # Append Lumens Converters if it's not already in the file
     if (bpy.data.node_groups.find("Lumens Converter") == -1):
         nodes_directory = os.path.dirname(os.path.abspath(__file__)) + "/real_lights.blend\\NodeTree\\"
         bpy.ops.wm.append(
             filename = "Lumens Converter", 
+            directory = nodes_directory
+        )
+    if (bpy.data.node_groups.find("Spot Lumens Converter") == -1):
+        nodes_directory = os.path.dirname(os.path.abspath(__file__)) + "/real_lights.blend\\NodeTree\\"
+        bpy.ops.wm.append(
+            filename = "Spot Lumens Converter", 
+            directory = nodes_directory
+        )
+    if (bpy.data.node_groups.find("Area Lumens Converter") == -1):
+        nodes_directory = os.path.dirname(os.path.abspath(__file__)) + "/real_lights.blend\\NodeTree\\"
+        bpy.ops.wm.append(
+            filename = "Area Lumens Converter", 
             directory = nodes_directory
         )
     
@@ -89,9 +101,14 @@ def create_light(self, context, light, strength, temp, useNodes, useSky):
             light_data.node_tree.links.new(k.outputs[0], nodes["Emission"].inputs[0])
         else:
             lumens_node = nodes.new("ShaderNodeGroup")
-            lumens_node.node_tree = bpy.data.node_groups["Lumens Converter"]
+            if light.lightType == "SPOT":
+                lumens_node.node_tree = bpy.data.node_groups["Spot Lumens Converter"]
+                lumens_node.inputs[3].default_value = spotSize
+            elif light.lightType == "AREA":
+                lumens_node.node_tree = bpy.data.node_groups["Area Lumens Converter"]
+            else:
+                lumens_node.node_tree = bpy.data.node_groups["Lumens Converter"]
             light_data.node_tree.links.new(lumens_node.outputs[0], nodes["Light Output"].inputs[0])
-
             lumens_node.inputs[0].default_value = strength
             lumens_node.inputs[1].default_value = temp
     
@@ -120,7 +137,6 @@ def create_light(self, context, light, strength, temp, useNodes, useSky):
         else:
             nodes["Background"].inputs[1].default_value = 750
         
-
     def to_linear(i):
         if i <= 0.04045 :
             x = i * (1.0 / 12.92)
@@ -170,7 +186,8 @@ def create_light(self, context, light, strength, temp, useNodes, useSky):
             setup_nodes()
         else:
             light_data.color = convert_kelvin(temp)
-            light_data.energy = convert_lumens(strength, light_data.color)
+            light_data.spot_size = spotSize / 57.2957795
+            light_data.energy = convert_lumens(strength, light_data.color) * (360 / spotSize)
             light_data.use_custom_distance = True
             
     elif light.lightType == "AREA":
@@ -179,7 +196,7 @@ def create_light(self, context, light, strength, temp, useNodes, useSky):
             setup_nodes()
         else:
             light_data.color = convert_kelvin(temp)
-            light_data.energy = convert_lumens(strength, light_data.color)
+            light_data.energy = convert_lumens(strength, light_data.color) * 1.95
             light_data.use_custom_distance = True
             
     elif light.lightType == "SUN":
@@ -242,7 +259,13 @@ def create_light_operator(light):
             default = False,
             description = "Create a new World with a Sky texture linked to the rotation of the sun lamp. Currently the Sky texture only renderes correctly in Cycles."
         )
-        
+        spotSize: bpy.props.IntProperty(
+            name = "Spot Angle",
+            default = 65,
+            min = 1,
+            max = 180,
+            description = "Setting the spot angle here will keep the total amount of light generated the same regardless of the spot size",
+        )
         def draw(self, context):
             layout = self.layout
             layout.use_property_split = True
@@ -253,10 +276,12 @@ def create_light_operator(light):
             layout.prop(self, "useNodes")
             if light.lightType == "SUN":
                 layout.prop(self, "useSky")
+            elif light.lightType == "SPOT":
+                layout.prop(self, "spotSize")
 
 
         def execute(self, context):
-                create_light(self, context, light, self.strength, self.temp, self.useNodes, self.useSky)
+                create_light(self, context, light, self.strength, self.temp, self.useNodes, self.useSky, self.spotSize)
                 return {'FINISHED'}
     return OBJECT_OT_add_light
 
