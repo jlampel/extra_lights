@@ -58,9 +58,9 @@ led_lights = [led_01, led_02, led_03, led_04, led_05, led_06, led_07, led_08]
 
 fl_01 = Light("45w Daylight CFL", "45wcfl", "POINT", 0.03, 5500, 2250)
 fl_02 = Light("85w Daylight CFL", "45wcfl", "POINT", 0.03, 6500, 4500)
-flourescent_lights = [fl_01, fl_02]
+fluorescent_lights = [fl_01, fl_02]
 
-all_lights = natural_lights + incandescent_lights + led_lights + flourescent_lights
+all_lights = natural_lights + incandescent_lights + led_lights + fluorescent_lights
 
 # Add new light
 def create_light(self, context, light, strength, temp, useNodes, useSky, spotSize):
@@ -288,7 +288,7 @@ def create_light_operator(light):
 natural_operators = [create_light_operator(light) for light in natural_lights]
 incandescent_operators = [create_light_operator(light) for light in incandescent_lights]
 led_operators = [create_light_operator(light) for light in led_lights]
-flourescent_operators = [create_light_operator(light) for light in flourescent_lights]
+fluorescent_operators = [create_light_operator(light) for light in fluorescent_lights]
 
 # Create menu items
 class NaturalsMenu(bpy.types.Menu):
@@ -324,12 +324,12 @@ class LEDsMenu(bpy.types.Menu):
                 text=op.name,
                 icon='LIGHT_'+op.lightType)
 
-class FlourescentsMenu(bpy.types.Menu):
-    bl_idname = "OBJECT_MT_flourescents_menu"
-    bl_label = "Flourescent"
+class FluorescentsMenu(bpy.types.Menu):
+    bl_idname = "OBJECT_MT_fluorescents_menu"
+    bl_label = "Fluorescent"
     def draw(self, context):
         layout = self.layout
-        for op in flourescent_operators:
+        for op in fluorescent_operators:
             self.layout.operator(
                 op.bl_idname,
                 text=op.name,
@@ -341,18 +341,18 @@ def draw_IncandescentsMenu(self, context):
     self.layout.menu(IncandescentsMenu.bl_idname, icon='LIGHT')
 def draw_LEDsMenu(self, context):
     self.layout.menu(LEDsMenu.bl_idname, icon='LIGHT')
-def draw_FlourescentsMenu(self, context):
-    self.layout.menu(FlourescentsMenu.bl_idname, icon='LIGHT')
+def draw_FluorescentsMenu(self, context):
+    self.layout.menu(FluorescentsMenu.bl_idname, icon='LIGHT')
 
 # Registration 
-classes = [NaturalsMenu, IncandescentsMenu, LEDsMenu, FlourescentsMenu]
+classes = [NaturalsMenu, IncandescentsMenu, LEDsMenu, FluorescentsMenu]
 for op in natural_operators:
     classes.append(op)
 for op in incandescent_operators:
     classes.append(op)
 for op in led_operators:
     classes.append(op)
-for op in flourescent_operators:
+for op in fluorescent_operators:
     classes.append(op)
 
 def register():
@@ -361,7 +361,7 @@ def register():
     bpy.types.VIEW3D_MT_light_add.append(draw_NaturalsMenu)
     bpy.types.VIEW3D_MT_light_add.append(draw_IncandescentsMenu)
     bpy.types.VIEW3D_MT_light_add.append(draw_LEDsMenu)
-    bpy.types.VIEW3D_MT_light_add.append(draw_FlourescentsMenu)
+    bpy.types.VIEW3D_MT_light_add.append(draw_FluorescentsMenu)
 
 def unregister():
     for cls in reversed(classes):
@@ -369,7 +369,7 @@ def unregister():
     bpy.types.VIEW3D_MT_mesh_add.remove(draw_NaturalsMenu)
     bpy.types.VIEW3D_MT_mesh_add.remove(draw_IncandescentsMenu)
     bpy.types.VIEW3D_MT_light_add.remove(draw_LEDsMenu)
-    bpy.types.VIEW3D_MT_light_add.remove(draw_FlourescentsMenu)
+    bpy.types.VIEW3D_MT_light_add.remove(draw_FluorescentsMenu)
 
 if __name__ == "__main__":
     register()
