@@ -43,49 +43,51 @@ if (bpy.data.node_groups.find("Area Lumens Converter") == -1):
 # set light properties 
 
 class Light:
-    def __init__(self, name, id, lightType, radius, temp, strength):
+    def __init__(self, name, id, lightType, radius, temp, strength, exposure):
         self.name = name
         self.id = id
         self.lightType = lightType
         self.radius = radius
         self.temp = temp
         self.strength = strength
+        self.exposure = exposure
 
-nat_01 = Light("Candle", "candle", "POINT", 0.015, 1800, 12)
-nat_02 = Light("Fireplace", "fireplace", "POINT", 0.228, 2000, 500)
-nat_03 = Light("Sunset", "sunset", "SUN", 0.75, 3000, 500)
-nat_04 = Light("Overcast Sun", "overcast", "SUN", 50, 7000, 250)
-nat_05 = Light("Direct Sun", "directsun", "SUN", 0.526, 5250, 1000)
-natural_lights = [nat_01, nat_02, nat_03, nat_04, nat_05]
+nat_01 = Light("Candle", "candle", "POINT", 0.015, 1800, 12, 4.6)
+nat_02 = Light("Fireplace", "fireplace", "POINT", 0.228, 2000, 500, 5.6)
+nat_03 = Light("Sunset", "sunset", "SUN", 0.75, 3000, 500, -5.4)
+nat_04 = Light("Overcast Sun", "overcast", "SUN", 50, 7000, 250, -6.25)
+nat_05 = Light("Cloudy Sun", "cloudy", "SUN", 5, 6500, 650, -6.4)
+nat_06 = Light("Direct Sun", "directsun", "SUN", 0.526, 5250, 1000, -6.4)
+natural_lights = [nat_01, nat_02, nat_03, nat_04, nat_05, nat_06]
 
-inc_01 = Light("70 lm C7 Candelabra Appliance Light", "70c7", "POINT", 0.015, 2700, 70)
-inc_02 = Light("250 lm Vintage Tungsten Decorative Light", "vintage", "POINT", 0.025, 2700, 250)
-inc_03 = Light("200 lm A15 Appliance Light", "200a15", "POINT", 0.0216, 2700, 200)
-inc_04 = Light("400 lm A15 Appliance Light", "400a15", "POINT", 0.0216, 2700, 400)
-inc_05 = Light("1000 lm A19 Lamp Light", "1000a19", "POINT", 0.03, 2700, 1000)
-inc_06 = Light("2700 lm A21 Ceiling Light", "2700a21", "AREA", ["Disk", 0.033], 2700, 2700)
-inc_07 = Light("3000 lm Halogen Car Headlight", "3000headlight", "SPOT", [125, 0.02], 4100, 3000)
-inc_08 = Light("3800 lm A21 Ceiling Light", "3800a21", "AREA", ["DISK", 0.033], 2700, 3800)
-inc_09 = Light("5800 lm PS30 Barn Light", "5800ps30", "AREA", ["DISK", 0.038], 2700, 5800)
+inc_01 = Light("70 lm C7 Candelabra Appliance Light", "70c7", "POINT", 0.015, 2700, 70, 8)
+inc_02 = Light("200 lm A15 Appliance Light", "200a15", "POINT", 0.0216, 2700, 200, 7)
+inc_03 = Light("250 lm Vintage Tungsten Decorative Light", "vintage", "POINT", 0.025, 2700, 250, 6)
+inc_04 = Light("400 lm A15 Appliance Light", "400a15", "POINT", 0.0216, 2700, 400, 5.5)
+inc_05 = Light("1000 lm A19 Lamp Light", "1000a19", "POINT", 0.03, 2700, 1000, 4.25)
+inc_06 = Light("2700 lm A21 Ceiling Light", "2700a21", "AREA", ["DISK", 0.033], 2700, 2700, 3.4)
+inc_07 = Light("3000 lm Halogen Car Headlight", "3000headlight", "SPOT", [125, 0.02], 4100, 3000, 4.25)
+inc_08 = Light("3800 lm A21 Ceiling Light", "3800a21", "AREA", ["DISK", 0.033], 2700, 3800, 3.6)
+inc_09 = Light("5800 lm PS30 Barn Light", "5800ps30", "AREA", ["DISK", 0.038], 2700, 5800, 3.25)
 incandescent_lights = [inc_01, inc_02, inc_03, inc_04, inc_05, inc_06, inc_07, inc_08, inc_09]
 
-led_01 = Light("400 lm Flashlight", "400flashlight", "SPOT", [65, 0.0075], 2700, 400)
-led_02 = Light("800 lm A19 Lamp LED", "800a19", "POINT", 0.034, 3000, 800)
-led_03 = Light("1400 lm Flashlight", "1400flashlight", "SPOT", [65, 0.0075], 4000, 1400)
-led_04 = Light("1500 lm PAR38 Outdoor Floodlight", "1400par38", "AREA", ["DISK", 0.06], 3000, 1500)
-led_05 = Light("1600 lm A21 Ceiling LED", "1600a21", "AREA", ["DISK", 0.034], 5000, 1600)
-led_06 = Light("2500 lm Photography LED Bar", "2500bar", "AREA", ["RECTANGLE", 0.03, 0.4], 5500, 2500)
-led_07 = Light("2600 lm PAR38 Outdoor Floodlight", "2600par38", "AREA", ["DISK", 0.06], 3000, 2600)
-led_08 = Light("3350 lm Photography LED Pack", "3350pack", "AREA", ["RECTANGLE", 0.23, 0.178], 5600, 3350)
-led_09 = Light("5000 lm LED Car Headlight", "headlightled", "SPOT", [125, 0.02], 6500, 5000)
-led_10 = Light("9100 lm Industrial LED Wall Pack", "9100flood", "AREA", ["RECTANGLE", 0.23, 0.178], 5000, 9100)
+led_01 = Light("400 lm Flashlight", "400flashlight", "SPOT", [65, 0.0075], 2700, 400, 5.25)
+led_02 = Light("800 lm A19 Lamp LED", "800a19", "POINT", 0.034, 3000, 800, 4.75)
+led_03 = Light("1400 lm Flashlight", "1400flashlight", "SPOT", [65, 0.0075], 4000, 1400, 2.5)
+led_04 = Light("1500 lm PAR38 Outdoor Floodlight", "1400par38", "AREA", ["DISK", 0.06], 3000, 1500, 1.25)
+led_05 = Light("1600 lm A21 Ceiling LED", "1600a21", "AREA", ["DISK", 0.034], 5000, 1600, 1)
+led_06 = Light("2500 lm Photography LED Bar", "2500bar", "AREA", ["RECTANGLE", 0.03, 0.4], 5500, 2500, 0.5)
+led_07 = Light("2600 lm PAR38 Outdoor Floodlight", "2600par38", "AREA", ["DISK", 0.06], 3000, 2600, 0.5)
+led_08 = Light("3350 lm Photography LED Pack", "3350pack", "AREA", ["RECTANGLE", 0.23, 0.178], 5600, 3350, 0)
+led_09 = Light("5000 lm LED Car Headlight", "headlightled", "SPOT", [125, 0.02], 6500, 5000, 1.5)
+led_10 = Light("9100 lm Industrial LED Wall Pack", "9100flood", "AREA", ["RECTANGLE", 0.23, 0.178], 5000, 9100, -0.5)
 led_lights = [led_01, led_02, led_03, led_04, led_05, led_06, led_07, led_08, led_09, led_10] 
 
-fl_01 = Light("1500 lm Photography Umbrella", "1500ubmrella", "AREA", ["DISK", 0.838], 5000, 1500)
-fl_02 = Light("2000 lm Photography Softbox", "2000softbox", "AREA", ["SQUARE", 0.61], 5000, 2000)
-fl_03 = Light("2250 lm Photography CFL", "2250cfl", "POINT", 0.03, 5500, 2250)
-fl_04 = Light("2500 lm Fluorescent Tube", "2500tube", "AREA", ["RECTANGLE", 0.05, 1.22], 5000, 2500)
-fl_05 = Light("4500 lm Daylight CFL", "4500cfl", "POINT", 0.03, 6500, 4500)
+fl_01 = Light("1500 lm Photography Umbrella", "1500ubmrella", "AREA", ["DISK", 0.838], 5000, 1500, -0.5)
+fl_02 = Light("2000 lm Photography Softbox", "2000softbox", "AREA", ["SQUARE", 0.61], 5000, 2000, -0.5)
+fl_03 = Light("2250 lm Photography CFL", "2250cfl", "POINT", 0.03, 5500, 2250, 2)
+fl_04 = Light("2500 lm Fluorescent Tube", "2500tube", "AREA", ["RECTANGLE", 0.05, 1.22], 5000, 2500, 1)
+fl_05 = Light("4500 lm Daylight CFL", "4500cfl", "POINT", 0.03, 6500, 4500, 1.5)
 fluorescent_lights = [fl_01, fl_02, fl_03, fl_04, fl_05]
 
 all_lights = natural_lights + incandescent_lights + led_lights + fluorescent_lights
@@ -226,7 +228,7 @@ def create_light(self, context, light, colType, temp, tint, useNodes, useSky, sp
             light_data.use_custom_distance = True
             
     elif light.lightType == "SUN":
-        light_data.angle = light.radius
+        light_data.angle = light.radius / 57.2957795 
         if light.id == "sunset":
             light_object.rotation_euler[0] = 1.4835
             light_object.rotation_euler[1] = 0.785398
@@ -239,7 +241,7 @@ def create_light(self, context, light, colType, temp, tint, useNodes, useSky, sp
             z = (125/100) * bpy.context.scene.camera.location[2]
             light_object.location[2] = z
 
-        if useNodes == True:
+        if useNodes:
             setup_nodes()
         else: 
             light_data.energy = light.strength
@@ -247,8 +249,11 @@ def create_light(self, context, light, colType, temp, tint, useNodes, useSky, sp
             
         if useSky:
             setup_sky()
-        
-    
+
+def set_exposure(light, setExposure):
+    if setExposure:
+        bpy.context.scene.view_settings.exposure = light.exposure
+
 # Create operators
 def create_light_operator(light):
     class OBJECT_OT_add_light(Operator):
@@ -323,6 +328,11 @@ def create_light_operator(light):
             default = False,
             description = "Create a new World with a Sky texture linked to the rotation of the sun lamp. Currently the Sky texture only renderes correctly in Cycles."
         )
+        setExposure: bpy.props.BoolProperty(
+            name = "Set Exposure",
+            default = False,
+            description = "Set the scene exposure to approximately match the added light. Exposusure heavily depends on context, so it's recommended that you adjust it further before your final render."
+        )
 
         def draw(self, context):
             layout = self.layout
@@ -330,26 +340,29 @@ def create_light_operator(light):
             layout.use_property_decorate = False
 
             layout.prop(self, "strength")
-            layout.prop(self, "colType")
 
             if light.lightType == "SUN":
                 layout.prop(self, "temp")
             else:
+                layout.prop(self, "colType")
                 if self.colType == "kelvin":
                     layout.prop(self, "temp")
                 else:
                     layout.prop(self, "tint")
+
+            if light.lightType == "SPOT":
+                layout.prop(self, "spotSize")
                 
             layout.prop(self, "useNodes")
 
             if light.lightType == "SUN":
                 layout.prop(self, "useSky")
-            elif light.lightType == "SPOT":
-                layout.prop(self, "spotSize")
 
+            layout.prop(self, "setExposure")
 
         def execute(self, context):
                 create_light(self, context, light, self.colType, self.temp, self.tint, self.useNodes, self.useSky, self.spotSize)
+                set_exposure(light, self.setExposure)
                 return {'FINISHED'}
     return OBJECT_OT_add_light
 
