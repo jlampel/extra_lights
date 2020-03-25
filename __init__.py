@@ -23,9 +23,6 @@ bl_info = {
     "category": "Add Light",
 }
 
-moduleNames = ['light_classes', 'light_presets']
-
-import bpy, os, sys, importlib
 from . import auto_load
 
 auto_load.init()

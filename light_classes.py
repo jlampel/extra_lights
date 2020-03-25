@@ -110,8 +110,10 @@ class PointLight:
             bl_description = "Creates a physically based light"
             bl_options = {'REGISTER', 'UNDO'}
 
-            name = self.name
             lightType = 'POINT'
+            name = self.name
+            radius = self.radius
+            exposure = self.exposure
 
             lumens: props.lumens(self, self.lumens)
             colType: props.colType(self)
@@ -164,6 +166,7 @@ class PointLight:
                 if self.setExposure:
                     bpy.context.scene.view_settings.exposure = self.exposure
 
+                ob.select_set(True)
                 return {'FINISHED'}
         return OBJECT_OT_add_pointlight
 
@@ -184,6 +187,8 @@ class SpotLight:
             bl_description = "Creates a physically based light"
             bl_options = {'REGISTER', 'UNDO'}
 
+            radius = self.radius
+            exposure = self.exposure
             name = self.name
             lightType = 'SPOT'
 
@@ -241,6 +246,7 @@ class SpotLight:
                 if self.setExposure:
                     bpy.context.scene.view_settings.exposure = self.exposure
 
+                ob.select_set(True)
                 return {'FINISHED'}
         return OBJECT_OT_add_spotlight
 
@@ -261,6 +267,9 @@ class AreaLight:
             bl_description = "Creates a physically based light"
             bl_options = {'REGISTER', 'UNDO'}
 
+            shape = self.shape
+            exposure = self.exposure
+            size = self.size
             name = self.name
             lightType = 'AREA'
 
@@ -291,7 +300,6 @@ class AreaLight:
                 ob = bpy.context.active_object
                 data = ob.data
 
-                data.shadow_soft_size = self.radius
                 data.shape = self.shape
                 data.size = self.size[0]
                 data.size_y = self.size[1]
@@ -318,6 +326,7 @@ class AreaLight:
                 if self.setExposure:
                     bpy.context.scene.view_settings.exposure = self.exposure
 
+                ob.select_set(True)
                 return {'FINISHED'}
         return OBJECT_OT_add_arealight
 
@@ -340,7 +349,11 @@ class SunLight:
             bl_description = "Creates a physically based light"
             bl_options = {'REGISTER', 'UNDO'}
             
+            rotation = self.rotation
+            skyTurbidity = self.skyTurbidity
+            skyStrength = self.skyStrength
             name = self.name
+            exposure = self.exposure
             lightType = 'SUN'
 
             irradiance: props.irradiance(self, self.irradiance)
@@ -379,12 +392,12 @@ class SunLight:
                     data.use_nodes = True
                     nodes = data.node_tree.nodes
 
-                    nodes["Emission"].inputs[1].default_value = self.strength
+                    nodes["Emission"].inputs[1].default_value = self.irradiance
                     k = nodes.new("ShaderNodeBlackbody")
                     k.inputs[0].default_value = self.temp
                     data.node_tree.links.new(k.outputs[0], nodes["Emission"].inputs[0])
                 else:
-                    data.energy = self.strength
+                    data.energy = self.irradiance
                     data.color = conversions.kelvin(self.temp)
 
                 if self.useSky:
@@ -392,7 +405,7 @@ class SunLight:
                     nodes = world.node_tree.nodes
                     sky_texture = nodes.new("ShaderNodeTexSky")
                     sky_texture.turbidity = self.skyTurbidity
-                    nodes["Background"].inputs[1].default_value = skyStrength
+                    nodes["Background"].inputs[1].default_value = self.skyStrength
                     world.node_tree.links.new(sky_texture.outputs[0], nodes["Background"].inputs[0])
                     
                     dr = sky_texture.driver_add("sun_direction")
@@ -405,6 +418,7 @@ class SunLight:
                 if self.setExposure:
                     bpy.context.scene.view_settings.exposure = self.exposure
 
+                ob.select_set(True)
                 return {'FINISHED'}
         return OBJECT_OT_add_sunlight
 
