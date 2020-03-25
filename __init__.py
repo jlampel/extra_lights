@@ -23,12 +23,10 @@ bl_info = {
     "category": "Add Light",
 }
 
-from . import auto_load
-
-auto_load.init()
+from . import ui
 
 def register():
-    auto_load.register()
+    ui.register()
 
 def unregister():
-    auto_load.unregister()
+    ui.unregister()

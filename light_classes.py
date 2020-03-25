@@ -112,6 +112,7 @@ class PointLight:
 
             lightType = 'POINT'
             name = self.name
+            lightName = name
             radius = self.radius
             exposure = self.exposure
 
@@ -138,7 +139,7 @@ class PointLight:
 
             def execute(self, context):
                 bpy.ops.object.light_add(type='POINT')
-                bpy.context.active_object.name = self.name
+                bpy.context.active_object.name = self.lightName
                 ob = bpy.context.active_object
                 data = ob.data
 
@@ -190,6 +191,7 @@ class SpotLight:
             radius = self.radius
             exposure = self.exposure
             name = self.name
+            lightName = name
             lightType = 'SPOT'
 
             lumens: props.lumens(self, self.lumens)
@@ -217,7 +219,7 @@ class SpotLight:
 
             def execute(self, context):
                 bpy.ops.object.light_add(type='SPOT')
-                bpy.context.active_object.name = self.name
+                bpy.context.active_object.name = self.lightName
                 ob = bpy.context.active_object
                 data = ob.data
 
@@ -271,6 +273,7 @@ class AreaLight:
             exposure = self.exposure
             size = self.size
             name = self.name
+            lightName = name
             lightType = 'AREA'
 
             lumens: props.lumens(self, self.lumens)
@@ -296,7 +299,7 @@ class AreaLight:
 
             def execute(self, context):
                 bpy.ops.object.light_add(type='AREA')
-                bpy.context.active_object.name = self.name
+                bpy.context.active_object.name = self.lightName
                 ob = bpy.context.active_object
                 data = ob.data
 
@@ -353,6 +356,7 @@ class SunLight:
             skyTurbidity = self.skyTurbidity
             skyStrength = self.skyStrength
             name = self.name
+            lightName = name
             exposure = self.exposure
             lightType = 'SUN'
 
@@ -375,7 +379,7 @@ class SunLight:
 
             def execute(self, context):
                 bpy.ops.object.light_add(type='SUN')
-                bpy.context.active_object.name = self.name
+                bpy.context.active_object.name = self.lightName
                 ob = bpy.context.active_object
                 data = ob.data
 
@@ -412,7 +416,7 @@ class SunLight:
                     for i in range(3):
                         dr[i].driver.expression = "var"
                         var = dr[i].driver.variables.new()
-                        var.targets[0].tag = ob
+                        var.targets[0].id = ob
                         var.targets[0].data_path = "matrix_world[2]["+str(i)+"]"
 
                 if self.setExposure:

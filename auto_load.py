@@ -13,7 +13,7 @@ __all__ = (
     "unregister",
 )
 
-modules = None
+modules = ['light_classes']
 ordered_classes = None
 
 def init():
