@@ -4,6 +4,7 @@ PointLight = light_classes.PointLight
 SunLight = light_classes.SunLight
 SpotLight = light_classes.SpotLight
 AreaLight = light_classes.AreaLight
+IesLight = light_classes.IesLight
 
 lights = {
     'natural' : [
@@ -147,6 +148,16 @@ lights = {
         ),
     ], 
     'led' : [
+        IesLight(
+            name = '100 lm LED Bollard IES',
+            tag = '100bollard',
+            spotAngle = 0,
+            radius = 0.005,
+            temp = 4000,
+            strength = 0.05,
+            lumens = 100,
+            exposure = 5.75,
+        ),
         SpotLight(
             name = '400 lm Flashlight',
             tag = '400flashlight',

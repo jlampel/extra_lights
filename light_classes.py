@@ -6,10 +6,8 @@ from bpy.props import IntProperty, BoolProperty, FloatVectorProperty
 
 from . import conversions
 
-if os.path.dirname(os.path.abspath(__file__)) == 'C:\\':
-    nodes_directory = "C:/Users/jonat/Documents/GitHub/extra-lights" + "/real_lights.blend\\NodeTree\\"
-else: 
-    nodes_directory = os.path.dirname(os.path.abspath(__file__)) + "/real_lights.blend\\NodeTree\\"
+nodes_directory = os.path.dirname(os.path.abspath(__file__)) + "/real_lights.blend\\NodeTree\\"
+texts_directory = os.path.dirname(os.path.abspath(__file__)) + "/real_lights.blend\\Text\\"
 
 class props:
     def colType(self):
@@ -22,6 +20,12 @@ class props:
             description = "Set the light's color with either Kelvin or RGB values",
             default = "kelvin",
         )
+    def iesNodes(self):
+        return bpy.props.BoolProperty(
+            name = "Use Nodes (Cycles only)",
+            default = True,
+            description = "IES Textures only work with Cycles at the moment. Turning this off will just make it a regular light",
+        )   
     def irradiance(self, x):
         return bpy.props.IntProperty(
             name = "Irradiance",
@@ -42,7 +46,7 @@ class props:
         return bpy.props.BoolProperty(
             name = "Set Exposure",
             default = False,
-            description = "Set the scene exposure to approximately match the added light. Exposusure heavily depends on context, so it's recommended that you adjust it further before your final render."
+            description = "Set the scene exposure to approximately match the added light. Exposusure heavily depends on context, so it's recommended that you adjust it further before your final render"
         )
     def spotAngle(self, x):
         return bpy.props.IntProperty(
@@ -65,19 +69,19 @@ class props:
             subtype = 'COLOR',
             name = "Color Tint",
             default = (1.0, 1.0, 1.0),
-            description = "Sets the RGB color of the light"
+            description = "Sets the RGB color of the light",
         )
     def useNodes(self):
         return bpy.props.BoolProperty(
             name = "Use Nodes (Cycles only)",
             default = False,
-            description = "Create light with nodes so that lumens and color temperature can be changed at any time. Currently only works with Cycles."
+            description = "Create light with nodes so that lumens and color temperature can be changed at any time. Currently only works with Cycles.",
         )    
     def useSky(self):
         return bpy.props.BoolProperty(
             name = "Create Linked Sky (Cylces only)",
             default = False,
-            description = "Create a new World with a Sky texture linked to the rotation of the sun lamp. Currently the Sky texture only renderes correctly in Cycles."
+            description = "Create a new World with a Sky texture linked to the rotation of the sun lamp. Currently the Sky texture only renderes correctly in Cycles.",
         )
 
 class setup:
@@ -104,7 +108,7 @@ class PointLight:
         self.exposure = exposure
 
     def create_light(self):
-        class OBJECT_OT_add_pointlight(Operator):
+        class OBJECT_OT_add_light(Operator):
             bl_idname = "light.add_" + self.tag
             bl_label = "Add a " + self.name
             bl_description = "Creates a physically based light"
@@ -169,7 +173,7 @@ class PointLight:
 
                 ob.select_set(True)
                 return {'FINISHED'}
-        return OBJECT_OT_add_pointlight
+        return OBJECT_OT_add_light
 
 class SpotLight:
     def __init__(self, name, tag, radius, angle, temp, lumens, exposure):
@@ -182,7 +186,7 @@ class SpotLight:
         self.exposure = exposure
 
     def create_light(self):
-        class OBJECT_OT_add_spotlight(Operator):
+        class OBJECT_OT_add_light(Operator):
             bl_idname = "light.add_" + self.tag
             bl_label = "Add a " + self.name
             bl_description = "Creates a physically based light"
@@ -250,7 +254,7 @@ class SpotLight:
 
                 ob.select_set(True)
                 return {'FINISHED'}
-        return OBJECT_OT_add_spotlight
+        return OBJECT_OT_add_light
 
 class AreaLight:
     def __init__(self, name, tag, shape, size, temp, lumens, exposure):
@@ -263,7 +267,7 @@ class AreaLight:
         self.exposure = exposure
 
     def create_light(self):
-        class OBJECT_OT_add_arealight(Operator):
+        class OBJECT_OT_add_light(Operator):
             bl_idname = "light.add_" + self.tag
             bl_label = "Add a " + self.name
             bl_description = "Creates a physically based light"
@@ -331,7 +335,7 @@ class AreaLight:
 
                 ob.select_set(True)
                 return {'FINISHED'}
-        return OBJECT_OT_add_arealight
+        return OBJECT_OT_add_light
 
 class SunLight:
     def __init__(self, name, tag, angle, temp, irradiance, exposure, rotation, skyStrength, skyTurbidity):
@@ -346,7 +350,7 @@ class SunLight:
         self.skyTurbidity = skyTurbidity
 
     def create_light(self):
-        class OBJECT_OT_add_sunlight(Operator):
+        class OBJECT_OT_add_light(Operator):
             bl_idname = "light.add_" + self.tag
             bl_label = "Add a " + self.name
             bl_description = "Creates a physically based light"
@@ -424,19 +428,100 @@ class SunLight:
 
                 ob.select_set(True)
                 return {'FINISHED'}
-        return OBJECT_OT_add_sunlight
+        return OBJECT_OT_add_light
 
 class IesLight:
-    def __init__(self, name, tag, file, size, temp, strength, lumens, exposure):
+    def __init__(self, name, tag, spotAngle, radius, temp, strength, lumens, exposure):
         self.name = name
         self.tag = tag
-        self.file = file
-        self.size = size
+        self.spotAngle = spotAngle
+        self.radius = radius
         self.temp = temp
         self.strength = strength
         self.lumens = lumens
         self.exposure = exposure
 
-    def SetProperties(self):
-       pass
+    def create_light(self):
+        class OBJECT_OT_add_light(Operator):
+            bl_idname = "light.add_" + self.tag
+            bl_label = "Add a " + self.name
+            bl_description = "Creates a physically based light"
+            bl_options = {'REGISTER', 'UNDO'}
 
+            name = self.name
+            lightName = name
+            spotAngle = self.spotAngle
+            radius = self.radius
+            strength = self.strength
+            exposure = self.exposure
+            if spotAngle:
+                lightType = 'SPOT'
+            else:
+                lightType = 'POINT'
+
+            lumens: props.lumens(self, self.lumens)
+            spotAngle: props.spotAngle(self, self.spotAngle)
+            colType: props.colType(self)
+            temp: props.temp(self, self.temp)
+            tint: props.tint(self)
+            useNodes: props.iesNodes(self)
+            setExposure: props.setExposure(self)
+
+            def draw(self, context):
+                layout = self.layout
+                layout.use_property_split = True
+                layout.use_property_decorate = False
+
+                layout.prop(self, "lumens")
+                if self.lightType == 'SPOT':
+                    layout.prop(self, "spotAngle")
+                layout.prop(self, "colType")
+                if self.colType == "kelvin":
+                    layout.prop(self, "temp")
+                else:
+                    layout.prop(self, "tint")
+                layout.prop(self, "useNodes")
+                layout.prop(self, "setExposure")
+
+            def execute(self, context):
+                bpy.ops.object.light_add(type=self.lightType)
+                bpy.context.active_object.name = self.lightName
+                ob = bpy.context.active_object
+                data = ob.data
+
+                data.shadow_soft_size = self.radius
+                if self.spotAngle:
+                    data.spot_size = self.spotAngle / 57.2957795
+                data.use_custom_distance = True
+
+                if self.useNodes:
+                    if bpy.data.node_groups.find("IES Lumens Converter") == -1:
+                        bpy.ops.wm.append(filename = "IES Lumens Converter", directory = nodes_directory)
+                    
+                    if bpy.data.texts.find(self.lightName) == -1:
+                        bpy.ops.wm.append(filename = self.lightName, directory = texts_directory)
+                    
+                    data.energy = 1
+                    col = [self.tint[0], self.tint[1], self.tint[2], 1.0]
+                    data.use_nodes = True
+                    nodes = data.node_tree.nodes
+                    lumensNode = nodes.new("ShaderNodeGroup")
+                    lumensNode.node_tree = bpy.data.node_groups["IES Lumens Converter"]
+                    data.node_tree.links.new(lumensNode.outputs[0], nodes["Light Output"].inputs[0])
+                    lumensNode.inputs[0].default_value = self.lumens
+                    setup.nodeColor(self, lumensNode, self.colType, col, self.temp)
+                    
+                    iesNode = nodes.new('ShaderNodeTexIES')
+                    iesNode.ies = bpy.data.texts[self.lightName]
+                    iesNode.inputs[1].default_value = self.strength
+                    data.node_tree.links.new(iesNode.outputs[0], lumensNode.inputs[3])
+                    
+                else:
+                    setup.nodeless(self, data, self.colType, self.tint, self.temp, self.lumens)
+
+                if self.setExposure:
+                    bpy.context.scene.view_settings.exposure = self.exposure
+
+                ob.select_set(True)
+                return {'FINISHED'}
+        return OBJECT_OT_add_light
