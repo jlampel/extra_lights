@@ -86,13 +86,13 @@ class setup:
             lumensNode.inputs[1].default_value = 6000
             lumensNode.inputs[2].default_value = col
         else:
-            lumensNode.inputs[1].default_value = self.temp
+            lumensNode.inputs[1].default_value = temp
     def nodeless(self, data, colType, tint, temp, lumens):
         if colType == "rgb":
-            data.color = self.tint
+            data.color = tint
         else: 
-            data.color = conversions.kelvin(self.temp)
-        data.energy = conversions.lumens(self.lumens, data.color)
+            data.color = conversions.kelvin(temp)
+        data.energy = conversions.lumens(lumens, data.color)
 
 class PointLight:
     def __init__(self, name, tag, radius, temp, lumens, exposure):
@@ -104,7 +104,7 @@ class PointLight:
         self.exposure = exposure
 
     def create_light(self):
-        class OBJECT_OT_add_light(Operator):
+        class OBJECT_OT_add_pointlight(Operator):
             bl_idname = "light.add_" + self.tag
             bl_label = "Add a " + self.name
             bl_description = "Creates a physically based light"
@@ -165,7 +165,7 @@ class PointLight:
                     bpy.context.scene.view_settings.exposure = self.exposure
 
                 return {'FINISHED'}
-        return OBJECT_OT_add_light
+        return OBJECT_OT_add_pointlight
 
 class SpotLight:
     def __init__(self, name, tag, radius, angle, temp, lumens, exposure):
@@ -178,7 +178,7 @@ class SpotLight:
         self.exposure = exposure
 
     def create_light(self):
-        class OBJECT_OT_add_light(Operator):
+        class OBJECT_OT_add_spotlight(Operator):
             bl_idname = "light.add_" + self.tag
             bl_label = "Add a " + self.name
             bl_description = "Creates a physically based light"
@@ -242,7 +242,7 @@ class SpotLight:
                     bpy.context.scene.view_settings.exposure = self.exposure
 
                 return {'FINISHED'}
-        return OBJECT_OT_add_light
+        return OBJECT_OT_add_spotlight
 
 class AreaLight:
     def __init__(self, name, tag, shape, size, temp, lumens, exposure):
@@ -255,7 +255,7 @@ class AreaLight:
         self.exposure = exposure
 
     def create_light(self):
-        class OBJECT_OT_add_light(Operator):
+        class OBJECT_OT_add_arealight(Operator):
             bl_idname = "light.add_" + self.tag
             bl_label = "Add a " + self.name
             bl_description = "Creates a physically based light"
@@ -319,7 +319,7 @@ class AreaLight:
                     bpy.context.scene.view_settings.exposure = self.exposure
 
                 return {'FINISHED'}
-        return OBJECT_OT_add_light
+        return OBJECT_OT_add_arealight
 
 class SunLight:
     def __init__(self, name, tag, angle, temp, irradiance, exposure, rotation, skyStrength, skyTurbidity):
@@ -334,7 +334,7 @@ class SunLight:
         self.skyTurbidity = skyTurbidity
 
     def create_light(self):
-        class OBJECT_OT_add_light(Operator):
+        class OBJECT_OT_add_sunlight(Operator):
             bl_idname = "light.add_" + self.tag
             bl_label = "Add a " + self.name
             bl_description = "Creates a physically based light"
@@ -406,7 +406,7 @@ class SunLight:
                     bpy.context.scene.view_settings.exposure = self.exposure
 
                 return {'FINISHED'}
-        return OBJECT_OT_add_light
+        return OBJECT_OT_add_sunlight
 
 class IesLight:
     def __init__(self, name, tag, file, size, temp, strength, lumens, exposure):

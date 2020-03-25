@@ -61,6 +61,16 @@ def draw_leds(self, context):
 def draw_fluorescents(self, context):
     self.layout.menu(FluorescentsMenu.bl_idname, icon='LIGHT')
 
+classes = []
+for op in natural_operators:
+    classes.append(op)
+for op in incandescent_operators:
+    classes.append(op)
+for op in led_operators:
+    classes.append(op)
+for op in fluorescent_operators:
+    classes.append(op)
+
 def register():
     bpy.types.VIEW3D_MT_light_add.append(draw_naturals)
     bpy.types.VIEW3D_MT_light_add.append(draw_incandescents)
