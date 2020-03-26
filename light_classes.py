@@ -119,6 +119,7 @@ class PointLight:
             lightName = name
             radius = self.radius
             exposure = self.exposure
+            order = self.lumens
 
             lumens: props.lumens(self, self.lumens)
             colType: props.colType(self)
@@ -197,6 +198,7 @@ class SpotLight:
             name = self.name
             lightName = name
             lightType = 'SPOT'
+            order = self.lumens
 
             lumens: props.lumens(self, self.lumens)
             spotAngle: props.spotAngle(self, self.angle)
@@ -279,6 +281,7 @@ class AreaLight:
             name = self.name
             lightName = name
             lightType = 'AREA'
+            order = self.lumens
 
             lumens: props.lumens(self, self.lumens)
             colType: props.colType(self)
@@ -363,6 +366,7 @@ class SunLight:
             lightName = name
             exposure = self.exposure
             lightType = 'SUN'
+            order = self.irradiance * 1000
 
             irradiance: props.irradiance(self, self.irradiance)
             temp: props.temp(self, self.temp)
@@ -458,6 +462,7 @@ class IesLight:
                 lightType = 'SPOT'
             else:
                 lightType = 'POINT'
+            order = self.lumens
 
             lumens: props.lumens(self, self.lumens)
             spotAngle: props.spotAngle(self, self.spotAngle)
