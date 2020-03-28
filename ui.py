@@ -3,37 +3,38 @@ from pathlib import Path
 from bpy.utils import register_class, unregister_class
 
 from . import light_presets
+
+natural_operators = [ light.create_light() for light in light_presets.lights['natural'] ]
+incandescent_operators = [ light.create_light() for light in light_presets.lights['incandescent'] ]
+led_operators = [ light.create_light() for light in light_presets.lights['led'] ]
+fluorescent_operators = [ light.create_light() for light in light_presets.lights['fluorescent'] ]
+
 try:
     from . import light_presets_bonus
+    bonus = True
 except:
-    pass
+    bonus = False
 
 def sortOrder(op):
     return op.order
 
-natural_operators = [ light.create_light() for light in light_presets.lights['natural'] ]
-for light in light_presets_bonus.lights['natural']:
-    op = light.create_light()
-    natural_operators.append(op)
-natural_operators.sort(key=sortOrder)
-
-incandescent_operators = [ light.create_light() for light in light_presets.lights['incandescent'] ]
-for light in light_presets_bonus.lights['incandescent']:
-    op = light.create_light()
-    incandescent_operators.append(op)
-incandescent_operators.sort(key=sortOrder)
-
-led_operators = [ light.create_light() for light in light_presets.lights['led'] ]
-for light in light_presets_bonus.lights['led']:
-    op = light.create_light()
-    led_operators.append(op)
-led_operators.sort(key=sortOrder)
-
-fluorescent_operators = [ light.create_light() for light in light_presets.lights['fluorescent'] ]
-for light in light_presets_bonus.lights['fluorescent']:
-    op = light.create_light()
-    fluorescent_operators.append(op)
-fluorescent_operators.sort(key=sortOrder)
+if bonus:
+    for light in light_presets_bonus.lights['natural']:
+        op = light.create_light()
+        natural_operators.append(op)
+    natural_operators.sort(key=sortOrder)
+    for light in light_presets_bonus.lights['fluorescent']:
+        op = light.create_light()
+        fluorescent_operators.append(op)
+    fluorescent_operators.sort(key=sortOrder)
+    for light in light_presets_bonus.lights['incandescent']:
+        op = light.create_light()
+        incandescent_operators.append(op)
+    incandescent_operators.sort(key=sortOrder)
+    for light in light_presets_bonus.lights['led']:
+        op = light.create_light()
+        led_operators.append(op)
+    led_operators.sort(key=sortOrder)   
 
 class NaturalsMenu(bpy.types.Menu):
     bl_idname = "OBJECT_MT_naturals_menu"
