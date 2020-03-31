@@ -248,6 +248,13 @@ class SpotLight:
                     lumensNode.inputs[0].default_value = self.lumens
                     setup.nodeColor(self, lumensNode, self.colType, col, self.temp)
 
+                    dr = lumensNode.inputs[3].driver_add("default_value")
+                    dr.driver.expression = "var * 57.2957795"
+                    var = dr.driver.variables.new()
+                    var.targets[0].id_type = 'LIGHT'
+                    var.targets[0].id = data
+                    var.targets[0].data_path = "spot_size"
+
                 else:
                     setup.nodeless(self, data, self.colType, self.tint, self.temp, self.lumens)
 
