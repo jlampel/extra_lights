@@ -54,7 +54,7 @@ class props:
             default = x,
             min = 1,
             max = 180,
-            description = "Setting the spot angle here will keep the total amount of light generated the same regardless of the spot size",
+            description = "Setting the spot angle here will keep the total amount of light generated the same regardless of the angle.",
         )
     def temp(self, x):
         return bpy.props.IntProperty(
@@ -257,6 +257,7 @@ class SpotLight:
 
                 else:
                     setup.nodeless(self, data, self.colType, self.tint, self.temp, self.lumens)
+                    data.energy = (360 / self.spotAngle) * conversions.lumens(self.lumens, data.color) 
 
                 if self.setExposure:
                     bpy.context.scene.view_settings.exposure = self.exposure
