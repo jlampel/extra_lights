@@ -316,8 +316,8 @@ class AreaLight:
                 data.use_custom_distance = True
 
                 if self.useNodes:
-                    if (bpy.data.node_groups.find("Area Lumens Converter") == -1):
-                        bpy.ops.wm.append(filename = "Area Lumens Converter", directory = nodes_directory)
+                    if (bpy.data.node_groups.find("Lumens Converter") == -1):
+                        bpy.ops.wm.append(filename = "Lumens Converter", directory = nodes_directory)
 
                     data.energy = 1
                     col = [self.tint[0], self.tint[1], self.tint[2], 1.0]
@@ -325,7 +325,7 @@ class AreaLight:
                     nodes = data.node_tree.nodes
 
                     lumensNode = nodes.new("ShaderNodeGroup")
-                    lumensNode.node_tree = bpy.data.node_groups["Area Lumens Converter"]
+                    lumensNode.node_tree = bpy.data.node_groups["Lumens Converter"]
                     data.node_tree.links.new(lumensNode.outputs[0], nodes["Light Output"].inputs[0])
                     lumensNode.inputs[0].default_value = self.lumens
                     setup.nodeColor(self, lumensNode, self.colType, col, self.temp)
