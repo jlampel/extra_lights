@@ -151,6 +151,9 @@ class PointLight:
                 data.shadow_soft_size = self.radius
                 data.use_custom_distance = True
 
+                if bpy.context.scene.render.engine == 'CYCLES':
+                    self.useNodes = True
+
                 if self.useNodes:
                     if bpy.data.node_groups.find("Lumens Converter") == -1:
                         bpy.ops.wm.append(filename = "Lumens Converter", directory = nodes_directory)
@@ -233,6 +236,9 @@ class SpotLight:
                 data.shadow_soft_size = self.radius
                 data.spot_size = self.spotAngle / 57.2957795 
                 data.use_custom_distance = True
+
+                if bpy.context.scene.render.engine == 'CYCLES':
+                    self.useNodes = True
 
                 if self.useNodes:
                     if (bpy.data.node_groups.find("Spot Lumens Converter") == -1):
@@ -323,6 +329,9 @@ class AreaLight:
                 data.size_y = self.size[1]
                 data.use_custom_distance = True
 
+                if bpy.context.scene.render.engine == 'CYCLES':
+                    self.useNodes = True
+
                 if self.useNodes:
                     if (bpy.data.node_groups.find("Lumens Converter") == -1):
                         bpy.ops.wm.append(filename = "Lumens Converter", directory = nodes_directory)
@@ -403,6 +412,9 @@ class SunLight:
                 if bpy.context.scene.camera != None:
                     z = (125/100) * bpy.context.scene.camera.location[2]
                     ob.location[2] = z
+
+                if bpy.context.scene.render.engine == 'CYCLES':
+                    self.useNodes = True
 
                 if self.useNodes:
                     if (bpy.data.node_groups.find("Lumens Converter") == -1):
