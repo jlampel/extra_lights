@@ -17,6 +17,17 @@ lights = {
             exposure = 6,
         ),
         SunLight(
+            name = 'Moonlight',
+            tag = 'moonlight',
+            angle = 0.75, 
+            temp = 4500, 
+            irradiance = 0.001, 
+            exposure = 12,
+            rotation = [0.785398, 0.785398, 0],
+            skyStrength = 0.0001,
+            skyTurbidity = 5,
+        ),
+        SunLight(
             name = 'Direct Sun',
             tag = 'directsun',
             angle = 0.526, 
