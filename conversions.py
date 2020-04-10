@@ -1,5 +1,7 @@
 import bpy
 
+#from colour.temperature import ohno2013
+
 def linear(i):
     if i <= 0.04045 :
         x = i * (1.0 / 12.92)
@@ -25,8 +27,12 @@ def kelvin(kelvin):
     }
     rgb = kelvin_table[round(kelvin, -2)]
     color = [linear(rgb[0]/255), linear(rgb[1]/255), linear(rgb[2]/255)]
+
+    # implement ohno2013 CCT to RGB here
+
     return color
 
 def lumens(lumens, rgb):
     power = lumens / ( (rgb[0] * 145.256) + (rgb[1] * 488.449) + (rgb[2] * 49.2955) )
     return power
+

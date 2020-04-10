@@ -27,10 +27,10 @@ class props:
             description = "IES Textures only work with Cycles at the moment. Turning this off will just make it a regular light",
         )   
     def irradiance(self, x):
-        return bpy.props.IntProperty(
+        return bpy.props.FloatProperty(
             name = "Irradiance",
             default = x,
-            min = 50,
+            min = 0.0001,
             max = 2000,
             description = "Amound of light that hits a direct surface as measured in watts per square meter",
         )
@@ -171,6 +171,9 @@ class PointLight:
 
                 if self.setExposure:
                     bpy.context.scene.view_settings.exposure = self.exposure
+                    if self.exposure > 0:
+                        bpy.context.scene.cycles.light_sampling_threshold = 0.01 / (self.exposure * 10)
+
 
                 ob.select_set(True)
                 return {'FINISHED'}
@@ -261,6 +264,8 @@ class SpotLight:
 
                 if self.setExposure:
                     bpy.context.scene.view_settings.exposure = self.exposure
+                    if self.exposure > 0:
+                        bpy.context.scene.cycles.light_sampling_threshold = 0.01 / (self.exposure * 10)
 
                 ob.select_set(True)
                 return {'FINISHED'}
@@ -343,6 +348,8 @@ class AreaLight:
 
                 if self.setExposure:
                     bpy.context.scene.view_settings.exposure = self.exposure
+                    if self.exposure > 0:
+                        bpy.context.scene.cycles.light_sampling_threshold = 0.01 / (self.exposure * 10)
 
                 ob.select_set(True)
                 return {'FINISHED'}
@@ -373,6 +380,7 @@ class SunLight:
             name = self.name
             lightName = name
             exposure = self.exposure
+            angle = self.angle
             lightType = 'SUN'
             order = self.irradiance * 1000
 
@@ -399,6 +407,7 @@ class SunLight:
                 ob = bpy.context.active_object
                 data = ob.data
 
+                data.angle = self.angle / 57.2957795 
                 ob.rotation_euler = self.rotation
                 if bpy.context.scene.camera != None:
                     z = (125/100) * bpy.context.scene.camera.location[2]
@@ -437,6 +446,8 @@ class SunLight:
 
                 if self.setExposure:
                     bpy.context.scene.view_settings.exposure = self.exposure
+                    if self.exposure > 0:
+                        bpy.context.scene.cycles.light_sampling_threshold = 0.01 / (self.exposure * 10)
 
                 ob.select_set(True)
                 return {'FINISHED'}
@@ -534,6 +545,8 @@ class IesLight:
 
                 if self.setExposure:
                     bpy.context.scene.view_settings.exposure = self.exposure
+                    if self.exposure > 0:
+                        bpy.context.scene.cycles.light_sampling_threshold = 0.01 / (self.exposure * 10)
 
                 ob.select_set(True)
                 return {'FINISHED'}
