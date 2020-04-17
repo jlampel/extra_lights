@@ -161,6 +161,7 @@ class PointLight:
                     nodes = data.node_tree.nodes
 
                     lumensNode = nodes.new("ShaderNodeGroup")
+                    lumensNode.location = (0,150)
                     lumensNode.node_tree = bpy.data.node_groups["Lumens Converter"]
                     data.node_tree.links.new(lumensNode.outputs[0], nodes["Light Output"].inputs[0])
                     lumensNode.inputs[0].default_value = self.lumens
@@ -246,6 +247,7 @@ class SpotLight:
                     data.use_nodes = True
                     nodes = data.node_tree.nodes
                     lumensNode = nodes.new("ShaderNodeGroup")
+                    lumensNode.location = (0,150)
                     lumensNode.node_tree = bpy.data.node_groups["Spot Lumens Converter"]
                     data.node_tree.links.new(lumensNode.outputs[0], nodes["Light Output"].inputs[0])
                     lumensNode.inputs[0].default_value = self.lumens
@@ -338,6 +340,7 @@ class AreaLight:
                     nodes = data.node_tree.nodes
 
                     lumensNode = nodes.new("ShaderNodeGroup")
+                    lumensNode.location = (0,150)
                     lumensNode.node_tree = bpy.data.node_groups["Lumens Converter"]
                     data.node_tree.links.new(lumensNode.outputs[0], nodes["Light Output"].inputs[0])
                     lumensNode.inputs[0].default_value = self.lumens
@@ -530,12 +533,14 @@ class IesLight:
                     data.use_nodes = True
                     nodes = data.node_tree.nodes
                     lumensNode = nodes.new("ShaderNodeGroup")
+                    lumensNode.location = (0,150)
                     lumensNode.node_tree = bpy.data.node_groups["IES Lumens Converter"]
                     data.node_tree.links.new(lumensNode.outputs[0], nodes["Light Output"].inputs[0])
                     lumensNode.inputs[0].default_value = self.lumens
                     setup.nodeColor(self, lumensNode, self.colType, col, self.temp)
                     
                     iesNode = nodes.new('ShaderNodeTexIES')
+                    iesNode.location = (-200,150)
                     iesNode.ies = bpy.data.texts[self.lightName]
                     iesNode.inputs[1].default_value = self.strength
                     data.node_tree.links.new(iesNode.outputs[0], lumensNode.inputs[3])
