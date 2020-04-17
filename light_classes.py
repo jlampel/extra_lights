@@ -326,8 +326,9 @@ class AreaLight:
                 else:
                     layout.prop(self, "tint")
                 layout.prop(self, "useNodes")
-                if self.useNodes:
-                    layout.prop(self, "spreadAngle")
+                spreadAngleRow = layout.row(align=True)
+                spreadAngleRow.enabled = self.useNodes
+                spreadAngleRow.prop(self, "spreadAngle")
                 layout.prop(self, "setExposure")
 
             def execute(self, context):
