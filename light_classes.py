@@ -56,6 +56,14 @@ class props:
             max = 180,
             description = "Setting the spot angle here will keep the total amount of light generated the same regardless of the angle.",
         )
+    def spreadAngle(self):
+        return bpy.props.IntProperty(
+            name = "Spread Angle",
+            default = 180,
+            min = 5,
+            max = 180,
+            description = "Lower values direct more light streight forward",
+        )
     def temp(self, x):
         return bpy.props.IntProperty(
             name = "Color Temperature",
@@ -304,6 +312,7 @@ class AreaLight:
             tint: props.tint(self)
             useNodes: props.useNodes(self)
             setExposure: props.setExposure(self)
+            spreadAngle: props.spreadAngle(self)
 
             def draw(self, context):
                 layout = self.layout
@@ -317,6 +326,8 @@ class AreaLight:
                 else:
                     layout.prop(self, "tint")
                 layout.prop(self, "useNodes")
+                if self.useNodes:
+                    layout.prop(self, "spreadAngle")
                 layout.prop(self, "setExposure")
 
             def execute(self, context):
@@ -331,8 +342,8 @@ class AreaLight:
                 data.use_custom_distance = True
 
                 if self.useNodes:
-                    if (bpy.data.node_groups.find("Lumens Converter") == -1):
-                        bpy.ops.wm.append(filename = "Lumens Converter", directory = nodes_directory)
+                    if (bpy.data.node_groups.find("Area Lumens Converter") == -1):
+                        bpy.ops.wm.append(filename = "Area Lumens Converter", directory = nodes_directory)
 
                     data.energy = 1
                     col = [self.tint[0], self.tint[1], self.tint[2], 1.0]
@@ -341,9 +352,10 @@ class AreaLight:
 
                     lumensNode = nodes.new("ShaderNodeGroup")
                     lumensNode.location = (0,150)
-                    lumensNode.node_tree = bpy.data.node_groups["Lumens Converter"]
+                    lumensNode.node_tree = bpy.data.node_groups["Area Lumens Converter"]
                     data.node_tree.links.new(lumensNode.outputs[0], nodes["Light Output"].inputs[0])
                     lumensNode.inputs[0].default_value = self.lumens
+                    lumensNode.inputs[3].default_value = self.spreadAngle
                     setup.nodeColor(self, lumensNode, self.colType, col, self.temp)
 
                 else:
