@@ -1,0 +1,1 @@
+{"light_presets": {"Natural": {"Candle": {}, "Moonlight": {}, "Overcast Sun": {}, "Direct Sun": {}, "Partly Cloudy Sun": {}, "Sunset Sun": {}, "Fireplace": {}}, "Interior": {"2,700 lm A21 Ceiling Light": {}, "3,000 lm Halogen Car Headlight": {}, "TV Screen": {}}}}

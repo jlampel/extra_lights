@@ -14,19 +14,19 @@
 bl_info = {
     "name": "Extra Lights",
     "author": "Jonathan Lampel",
-    "version": (1, 0),
-    "blender": (2, 82, 0),
+    "version": (1, 1),
+    "blender": (2, 83, 0),
     "location": "View3D > Add > Light",
     "description": "Adds new preset light objects based on real world values",
     "warning": "",
-    "doc_url": "",
+    "doc_url": "https://blendermarket.com/products/extra-lights/docs",
     "category": "Add Light",
 }
 
-from . import ui
+from . import save_presets, add_menu
 
 def register():
-    ui.register()
+    save_presets.register()
 
 def unregister():
-    ui.unregister()
+    save_presets.unregister()
