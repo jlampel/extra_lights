@@ -45,6 +45,7 @@ class EXTRALIGHTS_OT_export_presets(Operator):
 
         else:
             bpy.ops.extralights.export_error('INVOKE_DEFAULT')
+
         return {'FINISHED'}  
     
 class EXTRALIGHTS_PT_Panel(bpy.types.Panel):
@@ -80,29 +81,10 @@ class EXTRALIGHTS_OT_export_error(bpy.types.Operator):
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
 
-class EXTRALIGHTS_OT_mesh_material_error(bpy.types.Operator):
-    bl_idname = 'extralights.mesh_material_error'
-    bl_label = 'Export Error'
-
-    def execute(self, context):
-        self.report({'INFO'}, "Export Cancelled")
-        return {'FINISHED'}
-
-    def draw(self, context):
-        layout = self.layout
-        col = layout.column()
-        col.label(text='Please use a Lumens Converter node ')
-        col.label(text='in the first material slot ')
-        col.label(text='when exporting a mesh light')
-        
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self)
-
 classes = (
     EXTRALIGHTS_OT_export_presets,
     EXTRALIGHTS_PT_Panel,
     EXTRALIGHTS_OT_export_error,
-    EXTRALIGHTS_OT_mesh_material_error,
 )
     
 def register():
