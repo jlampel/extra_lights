@@ -46,9 +46,6 @@ for f in filenames:
 
 classes = category_classes + light_operators
 
-# for operator in list of category operators:
-    # classes.append(operator)
-
 def register():
     for cls in classes:
         register_class(cls)
