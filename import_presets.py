@@ -3,12 +3,11 @@ from pathlib import Path
 
 def load():
     light_presets = {}
-    path = os.path.dirname(os.path.abspath(__file__)) + '/presets/'
-    files = [f for f in glob.glob(path + "*.py")]
-
+    path = os.path.join( os.path.dirname(os.path.abspath(__file__)), 'presets' )
+    files = [f for f in glob.glob(os.path.join(path, "*.py"))]
     for f in files:
         data = json.load( open(f) )
-        light_presets = data
+        light_presets[f] = data
     return light_presets
 
 """

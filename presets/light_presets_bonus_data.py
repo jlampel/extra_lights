@@ -1,1 +1,0 @@
-{"light_presets_bonus": {"Outdoor": {"9,100 lm Industrial LED Wall Pack": {}}}}

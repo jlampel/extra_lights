@@ -1,4 +1,4 @@
-import bpy, os, json
+import bpy, os, json, textwrap
 from bpy.types import Operator, Panel
 from bpy.utils import register_class, unregister_class
 
@@ -21,16 +21,16 @@ class EXTRALIGHTS_OT_export_presets(Operator):
             filename = bpy.path.basename(bpy.context.blend_data.filepath)[:-6]
             file = open(path + '/presets/' + filename + '_data.py', 'w')
 
-            light_presets = { filename : {} }
+            light_presets = {}
 
             # Create dictionary of objects 
             presets_collection = bpy.data.collections['Light Presets']
 
             for category in presets_collection.children:
-                light_presets[filename][category.name] = {}
+                light_presets[category.name] = {}
 
                 def save_objects(object):
-                    light_presets[filename][category.name][object.name] = {
+                    light_presets[category.name][object.name] = {
                         # save attributes here
                     }
 
@@ -69,15 +69,10 @@ class EXTRALIGHTS_OT_export_error(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
         col = layout.column()
-        col.label(text=' ')
-        col.label(text='Please create a collection called Light Presets.')
-        col.label(text=' ')
-        col.label(text='Each collection inside of it will be a category, ')
-        col.label(text='and each light inside the categories ')
-        col.label(text='will be exported as a preset.')        
-        col.label(text=' ')
-        col.label(text='See the documentation for more detailed instructions')
-        
+        text = 'Please create a collection called Light Presets. Each collection inside Light Presets will be a category, and each object inside each category will be a preset. See documentation for more detailed instructions.'
+        for t in textwrap.wrap(text, width=50):
+            col.label(text=t)
+
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
 

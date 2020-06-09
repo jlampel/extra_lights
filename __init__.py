@@ -27,6 +27,8 @@ from . import save_presets, add_menu
 
 def register():
     save_presets.register()
+    add_menu.register()
 
 def unregister():
     save_presets.unregister()
+    add_menu.unregister()
