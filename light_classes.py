@@ -87,9 +87,9 @@ class props:
         )    
     def useSky(self):
         return bpy.props.BoolProperty(
-            name = "Create Linked Sky (Cylces only)",
+            name = "Create Linked Sky",
             default = False,
-            description = "Create a new World with a Sky texture linked to the rotation of the sun lamp. Currently the Sky texture only renderes correctly in Cycles.",
+            description = "Create a new World with a Sky texture linked to the rotation of the sun lamp.",
         )
 
 class setup:
@@ -449,6 +449,7 @@ class SunLight:
                     world = bpy.context.scene.world
                     nodes = world.node_tree.nodes
                     sky_texture = nodes.new("ShaderNodeTexSky")
+                    sky_texture.sky_type = 'HOSEK_WILKIE'
                     sky_texture.turbidity = self.skyTurbidity
                     nodes["Background"].inputs[1].default_value = self.skyStrength
                     world.node_tree.links.new(sky_texture.outputs[0], nodes["Background"].inputs[0])

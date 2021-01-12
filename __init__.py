@@ -14,8 +14,8 @@
 bl_info = {
     "name": "Extra Lights",
     "author": "Jonathan Lampel",
-    "version": (1, 0),
-    "blender": (2, 82, 0),
+    "version": (1, 1),
+    "blender": (2, 91, 0),
     "location": "View3D > Add > Light",
     "description": "Adds new preset light objects based on real world values",
     "warning": "",
