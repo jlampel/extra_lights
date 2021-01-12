@@ -446,10 +446,12 @@ class SunLight:
                     data.color = conversions.kelvin(self.temp)
 
                 if self.useSky:
+                    if bpy.context.scene.world == None:
+                        bpy.context.scene.world = bpy.data.worlds.new(name=self.name + " Sky")
                     world = bpy.context.scene.world
                     nodes = world.node_tree.nodes
                     sky_texture = nodes.new("ShaderNodeTexSky")
-                    sky_texture.sky_type = 'HOSEK_WILKIE'
+                    sky_texture.sky_type = "HOSEK_WILKIE"
                     sky_texture.turbidity = self.skyTurbidity
                     nodes["Background"].inputs[1].default_value = self.skyStrength
                     world.node_tree.links.new(sky_texture.outputs[0], nodes["Background"].inputs[0])
