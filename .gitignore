@@ -1,5 +1,9 @@
 
 light_presets_bonus.py
 real_lights_tests.blend
+real_lights.blend
+extra-lights-assets_only.blend
+*blender_assets*
 /.vscode/*
 /__pycache__/*
+thumbnails/*
