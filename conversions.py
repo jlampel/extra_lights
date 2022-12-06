@@ -7,7 +7,7 @@ This file is part of Extra Lights, created by Jonathan Lampel.
 
 All code distributed with this add-on is open source as described below. 
 
-Scattershot is free software; you can redistribute it and/or
+Extra Lights is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation; either version 3
 of the License, or (at your option) any later version.
