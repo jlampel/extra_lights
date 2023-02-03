@@ -29,8 +29,8 @@ from bpy.props import IntProperty, BoolProperty, FloatVectorProperty
 
 from . import conversions
 
-nodes_directory = os.path.dirname(os.path.abspath(__file__)) + "/real_lights.blend\\NodeTree\\"
-texts_directory = os.path.dirname(os.path.abspath(__file__)) + "/real_lights.blend\\Text\\"
+nodes_directory = bpy.path.native_pathsep(os.path.dirname(os.path.abspath(__file__)) + "/real_lights.blend\\NodeTree\\")
+texts_directory = bpy.path.native_pathsep(os.path.dirname(os.path.abspath(__file__)) + "/real_lights.blend\\Text\\")
 
 class props:
     def colType(self):
