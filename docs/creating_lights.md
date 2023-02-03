@@ -1,10 +1,14 @@
 excerpt: Adding lights with Extra Lights.
-nav_order: 1
+nav_order: 0
 nav_exclude: false
 search_exclude: false
 ---
 
 # Creating Lights with Extra Lights
+
+All of Extra Light's presets can be found in the 3D View's Add menu. 
+
+If you purchased the Blender Market version, you'll also have an asset browser ready file with each of the lights marked as assets. Using the asset version may be preferred in some situations, but you won't be able to adjust each light using Lumens after creation. 
 
 When you add a light with Extra Lights, you'll have the option to adjust its parameters via Blender's redo panel (F9). 
 
