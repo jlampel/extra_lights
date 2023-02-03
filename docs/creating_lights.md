@@ -5,7 +5,7 @@ nav_exclude: false
 search_exclude: false
 ---
 
-# Creating Lights with Extra Lights
+# Creating Lights
 
 All of Extra Light's presets can be found in the 3D View's Add menu. 
 
