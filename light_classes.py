@@ -123,11 +123,18 @@ class setup:
         else:
             lumensNode.inputs[1].default_value = temp
     def nodeless(self, data, colType, tint, temp, lumens):
+        data.energy = conversions.lumens(lumens, data.color)
         if colType == "rgb":
             data.color = tint
-        else: 
-            data.color = conversions.kelvin(temp)
-        data.energy = conversions.lumens(lumens, data.color)
+        elif colType == "kelvin": 
+            if bpy.app.version >= (4,5,0):
+                data.use_temperature = True
+                data.color = (1, 1, 1)
+                data.temperature = temp
+            else:
+                if bpy.app.version >= (4,5,0):
+                    data.use_temperature = False
+                data.color = conversions.kelvin(temp)
 
 class PointLight:
     def __init__(self, name, tag, radius, temp, lumens, exposure):
