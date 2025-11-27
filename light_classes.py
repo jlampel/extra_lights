@@ -486,18 +486,57 @@ class SunLight:
                     if "Background" not in nodes.keys():
                         background = nodes.new("ShaderNodeBackground")
                         world.node_tree.links.new(background.outputs[0], nodes["World Output"].inputs[0])
+
                     sky_texture = nodes.new("ShaderNodeTexSky")
-                    sky_texture.sky_type = "HOSEK_WILKIE"
-                    sky_texture.turbidity = self.skyTurbidity
-                    nodes["Background"].inputs[1].default_value = self.skyStrength
                     world.node_tree.links.new(sky_texture.outputs[0], nodes["Background"].inputs[0])
-                    
-                    dr = sky_texture.driver_add("sun_direction")
-                    for i in range(3):
-                        dr[i].driver.expression = "var"
-                        var = dr[i].driver.variables.new()
-                        var.targets[0].id = ob
-                        var.targets[0].data_path = "matrix_world[2]["+str(i)+"]"
+
+                    if bpy.app.version >= (5, 0, 0):
+                        sky_texture.sky_type = "MULTIPLE_SCATTERING"
+                        sky_texture.aerosol_density = self.skyTurbidity
+                        sky_texture.sun_disc = False
+                        nodes["Background"].inputs[1].default_value = self.skyStrength / 200
+
+                        elevation = sky_texture.driver_add("sun_elevation")
+                        dr = elevation.driver
+                        dr.expression = "asin(cos(y)*cos(x))"
+                        x = dr.variables.new()
+                        x.name = 'x'
+                        x.type = 'TRANSFORMS'
+                        x.targets[0].id = ob
+                        x.targets[0].transform_type = 'ROT_X'
+                        y = dr.variables.new()
+                        y.name = 'y'
+                        y.type = 'TRANSFORMS'
+                        y.targets[0].id = ob
+                        y.targets[0].transform_type = 'ROT_Y'
+
+                        rotation = sky_texture.driver_add("sun_rotation")
+                        dr = rotation.driver
+                        dr.expression = "-atan2(sin(x)*cos(y), -sin(y)) - pi/2"
+                        x = dr.variables.new()
+                        x.name = 'x'
+                        x.type = 'TRANSFORMS'
+                        x.targets[0].id = ob
+                        x.targets[0].transform_type = 'ROT_X'
+                        x.targets[0].rotation_mode = 'ZYX'
+                        y = dr.variables.new()
+                        y.name = 'y'
+                        y.type = 'TRANSFORMS'
+                        y.targets[0].id = ob
+                        y.targets[0].transform_type = 'ROT_Y'
+                        y.targets[0].rotation_mode = 'ZYX'
+
+                    else:
+                        sky_texture.sky_type = "HOSEK_WILKIE"
+                        sky_texture.turbidity = self.skyTurbidity
+                        nodes["Background"].inputs[1].default_value = self.skyStrength
+
+                        dr = sky_texture.driver_add("sun_direction")
+                        for i in range(3):
+                            dr[i].driver.expression = "var"
+                            var = dr[i].driver.variables.new()
+                            var.targets[0].id = ob
+                            var.targets[0].data_path = "matrix_world[2]["+str(i)+"]"
 
                 if self.setExposure:
                     bpy.context.scene.view_settings.exposure = self.exposure

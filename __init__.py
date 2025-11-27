@@ -24,7 +24,7 @@ along with this program; if not, see <https://www.gnu.org/licenses/>.
 bl_info = {
     "name": "Extra Lights",
     "author": "Jonathan Lampel",
-    "version": (1, 2),
+    "version": (1, 3),
     "blender": (2, 91, 0),
     "location": "View3D > Add > Light",
     "description": "Adds new preset light objects based on real world values",

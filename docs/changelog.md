@@ -7,6 +7,10 @@ search_exclude: false
 
 # Changelog
 
+## v1.3
+- Added support for native kelvin values in Blender 4.5
+- Added support for multiple scattering sky in Blender 5.0
+
 ## v1.2
 - Fixed issue with importing node groups on MacOS in Blender 3.4 
 - Added documentation
