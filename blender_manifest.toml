@@ -1,0 +1,37 @@
+schema_version = "1.0.0"
+
+id = "extra_lights"
+version = "1.3.0"
+name = "Extra Lights"
+tagline = "Adds new preset light objects based on real world values"
+maintainer = "Jonathan Lampel <orangeturbine@cgcookie.com>"
+# Supported types: "add-on", "theme"
+type = "add-on"
+
+# Optional: add-ons can list which resources they will require:
+# * "files" (for access of any filesystem operations)
+# * "network" (for internet access)
+# * "camera" (to capture photos and videos)
+# * "microphone" (to capture audio)
+# permissions = []
+
+# Optional link to documentation, support, source files, etc
+website = "https://jlampel.github.io/extra_lights/"
+
+# Optional list defined by Blender and server, see:
+# https://docs.blender.org/manual/en/dev/extensions/tags.html
+tags = ["3D View", "Lighting"]
+
+blender_version_min = "4.2.0"
+# Optional: maximum supported Blender version
+# blender_version_max = "6.1.0"
+
+# License conforming to https://spdx.org/licenses/ (use "SPDX: prefix)
+# https://docs.blender.org/manual/en/dev/extensions/licenses.html
+license = [
+  "SPDX:GPL-2.0-or-later",
+]
+# Optional: required by some licenses.
+copyright = [
+  "2024 Orange Turbine, Autotroph Inc"
+]
