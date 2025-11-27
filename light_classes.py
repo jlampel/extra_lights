@@ -473,7 +473,12 @@ class SunLight:
                     data.node_tree.links.new(k.outputs[0], nodes["Emission"].inputs[0])
                 else:
                     data.energy = self.irradiance
-                    data.color = conversions.kelvin(self.temp)
+                    if bpy.app.version >= (4, 5, 0):
+                        data.use_temperature = True
+                        data.color = (1, 1, 1)
+                        data.temperature = self.temp
+                    else:
+                        data.color = conversions.kelvin(self.temp)
 
                 if self.useSky:
                     if bpy.context.scene.world == None:
